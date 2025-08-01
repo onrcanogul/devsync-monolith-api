@@ -114,7 +114,7 @@ public class PullRequestServiceImpl implements PullRequestService {
             if (analysis != null) {
                 CommitAnalysis commitAnalysis = new CommitAnalysis();
                 commitAnalysis.setHash(analysis.getHash());
-//               commitAnalysis.setCommitRiskScore(analysis.getRiskScore());
+                commitAnalysis.setRiskScore(analysis.getRiskScore());
                 commitAnalysis.setTechnicalComment(analysis.getTechnicalComment());
                 commitAnalysis.setArchitecturalComment(analysis.getArchitecturalComment());
                 commitAnalysis.setFunctionalComment(analysis.getFunctionalComment());

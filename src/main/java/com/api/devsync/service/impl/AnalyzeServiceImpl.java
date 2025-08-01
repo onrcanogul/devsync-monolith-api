@@ -4,9 +4,11 @@ import com.api.devsync.entity.Analyze;
 import com.api.devsync.entity.CommitAnalysis;
 import com.api.devsync.entity.PullRequestAnalysis;
 import com.api.devsync.mapper.AnalyzeMapper;
+import com.api.devsync.mapper.PullRequestAnalyzeMapper;
 import com.api.devsync.mapper.custom.CustomPullRequestAnalyzeMapper;
 import com.api.devsync.model.dto.AnalyzeAIDto;
 import com.api.devsync.model.dto.AnalyzeDto;
+import com.api.devsync.model.dto.PullRequestAnalysisDto;
 import com.api.devsync.model.fromWebhook.GithubWebhookModel;
 import com.api.devsync.repository.PullRequestAnalysisRepository;
 import com.api.devsync.service.AnalyzeService;
@@ -27,12 +29,14 @@ public class AnalyzeServiceImpl implements AnalyzeService {
     private final AnalyzeMapper analyzeMapper;
     private final PullRequestAnalyzerService pullRequestAnalyzerService;
     private final CustomPullRequestAnalyzeMapper customPullRequestAnalyzeMapper;
+    private final PullRequestAnalyzeMapper pullRequestAnalyzeMapper;
 
-    public AnalyzeServiceImpl(PullRequestAnalysisRepository repository, AnalyzeMapper analyzeMapper, PullRequestAnalyzerService pullRequestAnalyzerService, CustomPullRequestAnalyzeMapper customPullRequestAnalyzeMapper) {
+    public AnalyzeServiceImpl(PullRequestAnalysisRepository repository, AnalyzeMapper analyzeMapper, PullRequestAnalyzerService pullRequestAnalyzerService, CustomPullRequestAnalyzeMapper customPullRequestAnalyzeMapper, PullRequestAnalyzeMapper pullRequestAnalyzeMapper) {
         this.repository = repository;
         this.analyzeMapper = analyzeMapper;
         this.pullRequestAnalyzerService = pullRequestAnalyzerService;
         this.customPullRequestAnalyzeMapper = customPullRequestAnalyzeMapper;
+        this.pullRequestAnalyzeMapper = pullRequestAnalyzeMapper;
     }
 
     public List<AnalyzeDto> get(int page, int size) {
@@ -58,12 +62,12 @@ public class AnalyzeServiceImpl implements AnalyzeService {
 
 
     @Transactional
-    public AnalyzeDto createAnalyze(GithubWebhookModel model) throws JsonProcessingException {
+    public PullRequestAnalysisDto createAnalyze(GithubWebhookModel model) throws JsonProcessingException {
         PullRequestAnalysis analyze = customPullRequestAnalyzeMapper.mapFromDto(model);
         getAnalyzeFromAI(analyze, model);
         PullRequestAnalysis createdAnalyze = repository.save(analyze);
 //        outboxRepository.save(outboxFactory.create(new PullRequestWithAnalysisDto(model, createdAnalyze), PullRequestAnalyze.class, PullRequestWithAnalysisDto.class, createdAnalyze.getId().toString()));
-        return analyzeMapper.toDto(createdAnalyze);
+        return pullRequestAnalyzeMapper.toDto(createdAnalyze);
     }
 
     private void getAnalyzeFromAI(PullRequestAnalysis analyze, GithubWebhookModel model) throws JsonProcessingException {

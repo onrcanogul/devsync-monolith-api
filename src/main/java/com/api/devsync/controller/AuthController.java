@@ -2,7 +2,6 @@ package com.api.devsync.controller;
 
 import com.api.devsync.service.GithubAuthService;
 import com.api.devsync.service.JwtService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

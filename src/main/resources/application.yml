@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: devsync-api
+
+  datasource:
+    url: jdbc:postgresql://devsync-db:5432/devsync-db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # create / create-drop / update / validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  secret: ZGV2c3luYy1zZWNyZXQta2V5LTEyMzQ1NnF3ZXJ0eXVp
+
+
+github:
+  token: ${GITHUB_TOKEN}
+  client:
+    id: ${GITHUB_CLIENT_ID}
+    secret: ${GITHUB_CLIENT_SECRET}
+
+openrouter:
+  token: ${SECONDARY_TOKEN}
+  base-url: ${OPENAI_BASE_URL}
+  model: ${OPENAI_MODEL}
+
+openai:
+  token: ${OPENAI_TOKEN}

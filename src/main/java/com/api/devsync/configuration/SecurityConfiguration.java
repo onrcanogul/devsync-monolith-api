@@ -29,6 +29,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/analyze/**").permitAll()
                         .requestMatchers("/api/pull-request/**").permitAll()
                         .requestMatchers("/api/git/**").permitAll()
+                        .requestMatchers("/api/git-webhook/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

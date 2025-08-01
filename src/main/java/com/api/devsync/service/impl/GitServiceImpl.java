@@ -13,6 +13,7 @@ import com.api.devsync.service.AnalyzeService;
 import com.api.devsync.service.GitService;
 import com.api.devsync.service.PullRequestService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class GitServiceImpl implements GitService {
         this.pullRequestService = pullRequestService;
     }
 
+    @Transactional
     @Override
     public void handlePullRequest(GithubWebhookModel model) throws JsonProcessingException {
         PullRequestAnalysisDto analyze = analyzeService.createAnalyze(model);

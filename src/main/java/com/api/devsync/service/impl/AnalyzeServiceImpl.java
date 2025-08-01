@@ -66,7 +66,6 @@ public class AnalyzeServiceImpl implements AnalyzeService {
         PullRequestAnalysis analyze = customPullRequestAnalyzeMapper.mapFromDto(model);
         getAnalyzeFromAI(analyze, model);
         PullRequestAnalysis createdAnalyze = repository.save(analyze);
-//        outboxRepository.save(outboxFactory.create(new PullRequestWithAnalysisDto(model, createdAnalyze), PullRequestAnalyze.class, PullRequestWithAnalysisDto.class, createdAnalyze.getId().toString()));
         return pullRequestAnalyzeMapper.toDto(createdAnalyze);
     }
 

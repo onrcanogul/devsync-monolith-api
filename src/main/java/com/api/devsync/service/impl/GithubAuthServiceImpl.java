@@ -7,6 +7,8 @@ import com.api.devsync.service.GithubAuthService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
@@ -31,18 +33,21 @@ public class GithubAuthServiceImpl implements GithubAuthService {
     }
 
     public String getAccessToken(String code) {
-        HttpHeaders headers = new HttpHeaders();
         RestTemplate restTemplate = new RestTemplate();
 
         String url = "https://github.com/login/oauth/access_token";
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        HashMap<String, String> body = new HashMap<>();
-        body.put("client_id", clientId);
-        body.put("client_secret", clientSecret);
-        body.put("code", code);
-        body.put("redirect_uri", "https://devsyncweb.site/oauth/callback");
 
-        HttpEntity<?> request = new HttpEntity<>(body, headers);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+        body.add("code", code);
+        body.add("redirect_uri", "https://devsyncweb.site/oauth/callback");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
         return (String) response.getBody().get("access_token");

@@ -30,8 +30,8 @@ public class GithubAuthServiceImpl implements GithubAuthService {
     private GithubTokenRepository githubTokenRepository;
 
     public GithubAuthServiceImpl(GithubTokenRepository githubTokenRepository) {
-        log.info("client-id: {}", clientId);
-        log.info("client-secret: {}", clientSecret);
+        System.out.println("client-id: " + clientId);
+        System.out.println("client-secret: " + clientSecret);
         this.githubTokenRepository = githubTokenRepository;
     }
 
@@ -41,7 +41,8 @@ public class GithubAuthServiceImpl implements GithubAuthService {
         String url = "https://github.com/login/oauth/access_token";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(MediaType.valueOf("application/vnd.github.v3+json")));
+
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
@@ -51,7 +52,7 @@ public class GithubAuthServiceImpl implements GithubAuthService {
         body.add("redirect_uri", "https://devsyncweb.site/oauth/callback");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-        log.info("request: {}", request.toString());
+        System.out.println("request: " + request.getBody());
         ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
         log.info("response: {}", response.getBody());
         return (String) response.getBody().get("access_token");

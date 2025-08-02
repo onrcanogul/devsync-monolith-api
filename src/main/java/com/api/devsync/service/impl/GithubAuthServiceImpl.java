@@ -40,7 +40,7 @@ public class GithubAuthServiceImpl implements GithubAuthService {
         body.put("client_id", clientId);
         body.put("client_secret", clientSecret);
         body.put("code", code);
-        body.put("redirect_uri", "http://localhost:3000/oauth/callback");
+        body.put("redirect_uri", "https://devsyncweb.site/oauth/callback");
 
         HttpEntity<?> request = new HttpEntity<>(body, headers);
 

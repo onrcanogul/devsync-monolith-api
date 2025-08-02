@@ -12,23 +12,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup JDK 21
+      - name: Setup JDK 21 (Temurin)
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: maven
+      - run: java -version
+      - run: mvn -v
 
-      - name: Cache Maven packages
+      - name: Cache Maven dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.m2
+          path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests
+        run: mvn clean package -DskipTests --no-transfer-progress
 
       - name: Deploy with Docker Compose on server
         uses: appleboy/ssh-action@v1.2.0
@@ -39,5 +44,8 @@ jobs:
           port: 22
           script: |
             cd /opt/devsync
-            docker compose down
+            echo "📦 Docker Compose ile eski containerları kapatılıyor..."
+            docker compose down || true
+            echo "🚀 Yeni image build ediliyor..."
             docker compose up -d --build
+            echo "✅ Deployment tamamlandı!"

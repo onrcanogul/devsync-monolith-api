@@ -34,6 +34,17 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean package -DskipTests --no-transfer-progress
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/devsync-api:latest .
+
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/devsync-api:latest
 
       - name: Copy docker-compose and files
         uses: appleboy/scp-action@v0.1.4

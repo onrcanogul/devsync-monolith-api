@@ -27,6 +27,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/git/**").permitAll()
+                        .requestMatchers("/api/analyze/**").permitAll()
+                        .requestMatchers("/api/commit/**").permitAll()
+                        .requestMatchers("/api/git-webhook/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

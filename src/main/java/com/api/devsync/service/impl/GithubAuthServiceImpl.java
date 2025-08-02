@@ -4,6 +4,7 @@ import com.api.devsync.entity.GithubToken;
 import com.api.devsync.exception.NotFoundException;
 import com.api.devsync.repository.GithubTokenRepository;
 import com.api.devsync.service.GithubAuthService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -12,12 +13,12 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class GithubAuthServiceImpl implements GithubAuthService {
 
     @Value("${github.client.id}")
@@ -29,6 +30,8 @@ public class GithubAuthServiceImpl implements GithubAuthService {
     private GithubTokenRepository githubTokenRepository;
 
     public GithubAuthServiceImpl(GithubTokenRepository githubTokenRepository) {
+        log.info("client-id: {}", clientId);
+        log.info("client-secret: {}", clientSecret);
         this.githubTokenRepository = githubTokenRepository;
     }
 
@@ -50,6 +53,7 @@ public class GithubAuthServiceImpl implements GithubAuthService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+        log.info("response: {}", response.toString());
         return (String) response.getBody().get("access_token");
     }
 

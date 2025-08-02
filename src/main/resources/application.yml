@@ -34,3 +34,6 @@ openrouter:
 
 openai:
   token: ${OPENAI_TOKEN}
+logging:
+  level:
+    root: info

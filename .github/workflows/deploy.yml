@@ -38,8 +38,6 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           port: 22
           script: |
-            cd /var/www/devsync-backend
-            # Eski container'ları durdur
+            cd /opt/devsync
             docker compose down
-            # Yeni imaj ile yeniden başlat
             docker compose up -d --build

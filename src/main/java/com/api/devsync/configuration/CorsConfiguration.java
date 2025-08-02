@@ -13,7 +13,7 @@ public class CorsConfiguration {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://devsyncweb.site/", "http://localhost:3000", "https://www.devsyncweb.site")
+                        .allowedOrigins("https://devsyncweb.site", "http://localhost:3000", "https://www.devsyncweb.site")
                         .allowedMethods("*")
                         .allowedHeaders("*");
             }

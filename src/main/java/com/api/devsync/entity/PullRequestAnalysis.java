@@ -17,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PullRequestAnalysis extends Analyze {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @OneToOne(mappedBy = "analysis")

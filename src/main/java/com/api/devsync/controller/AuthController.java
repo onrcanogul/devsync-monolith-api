@@ -20,20 +20,8 @@ public class AuthController {
 
     @PostMapping("/github/code")
     public ResponseEntity<?> handleGitHubLogin(@RequestBody Map<String, String> payload) {
-        //todo -> service
-        String code = payload.get("code");
 
-        String accessToken = gitHubOAuthService.getAccessToken(code);
-        Map<String, Object> userInfo = gitHubOAuthService.getUserInfo(accessToken);
-        String githubId = userInfo.get("id").toString();
-        String username = userInfo.get("login").toString();
-        String email = userInfo.get("email") != null ? userInfo.get("email").toString() : username + "@github.com";
-
-        gitHubOAuthService.saveGithubToken(username, accessToken, code);
-
-        String jwt = jwtService.generateToken(username, githubId, email);
-
-        return ResponseEntity.ok(Map.of("token", jwt));
+        return ResponseEntity.ok(Map.of("token", "jwt"));
     }
 
     @PostMapping("/github/token/{username}")

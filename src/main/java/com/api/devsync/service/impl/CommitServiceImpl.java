@@ -22,6 +22,6 @@ public class CommitServiceImpl implements CommitService {
 
     @Override
     public Commit getByHash(String hash) {
-        return commitRepository.findByHash(hash);
+        return commitRepository.findById(hash).get();
     }
 }

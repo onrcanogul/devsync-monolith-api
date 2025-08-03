@@ -32,11 +32,11 @@ public class PullRequest {
     @JoinColumn(name = "analysis_id", referencedColumnName = "id")
     private PullRequestAnalysis analysis;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "created_by_id")
     private User createdBy;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "repository_id")
     private Repository repository;
 }

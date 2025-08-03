@@ -11,7 +11,6 @@ import lombok.Setter;
 public class CommitAnalysis extends Analyze {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private String id;
 

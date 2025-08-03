@@ -97,7 +97,7 @@ public class PullRequestServiceImpl implements PullRequestService {
                     .orElseGet(() -> {
                         User u = new User();
                         u.setGithubId(sender.getId());
-                        return u;
+                        return userRepository.save(u);
                     });
             user.setUsername(sender.getLogin());
             user.setAvatarUrl(sender.getAvatar_url());
@@ -111,7 +111,7 @@ public class PullRequestServiceImpl implements PullRequestService {
                 .orElseGet(() -> {
                     Repository r = new Repository();
                     r.setId(repoDto.getId());
-                    return r;
+                    return repositoryRepository.save(r);
                 });
         repo.setName(repoDto.getName());
         repo.setFullName(repoDto.getFull_name());

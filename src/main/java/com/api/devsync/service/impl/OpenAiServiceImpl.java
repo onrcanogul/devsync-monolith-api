@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class OpenAiServiceImpl implements AIService {
+public class OpenAiServiceImpl {
 
     private final OpenAiService service ;
 
@@ -19,7 +19,6 @@ public class OpenAiServiceImpl implements AIService {
         this.service = new OpenAiService(openAIConfigurations.getToken());
     }
 
-    @Override
     public String send(String llm, String prompt) {
         ChatMessage userMessage = new ChatMessage("user", prompt);
 

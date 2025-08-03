@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Map;
 
 @Service
-public class RouterAIServiceImpl {
+public class RouterAIServiceImpl implements AIService{
 
     private final OpenRouterProperties properties;
     private final WebClient client;

@@ -1,5 +1,6 @@
 package com.api.devsync.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class CommitAnalysis extends Analyze {
 
     @OneToOne
     @JoinColumn(name = "commit_hash", referencedColumnName = "hash")
+    @JsonIgnore
     private Commit commit;
 
     @ManyToOne

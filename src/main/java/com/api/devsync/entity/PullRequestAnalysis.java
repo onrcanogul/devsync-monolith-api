@@ -1,5 +1,6 @@
 package com.api.devsync.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class PullRequestAnalysis extends Analyze {
     private UUID id;
 
     @OneToOne(mappedBy = "analysis")
+    @JsonIgnore
     private PullRequest pullRequest;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

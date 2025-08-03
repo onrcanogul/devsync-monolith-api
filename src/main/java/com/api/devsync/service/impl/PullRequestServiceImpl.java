@@ -6,9 +6,7 @@ import com.api.devsync.model.dto.CommitAnalysisDto;
 import com.api.devsync.model.dto.PullRequestAnalysisDto;
 import com.api.devsync.model.dto.PullRequestWithAnalysisDto;
 import com.api.devsync.model.fromWebhook.Sender;
-import com.api.devsync.repository.CommitAnalysisRepository;
-import com.api.devsync.repository.CommitRepository;
-import com.api.devsync.repository.PullRequestRepository;
+import com.api.devsync.repository.*;
 import com.api.devsync.service.PullRequestService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +23,15 @@ public class PullRequestServiceImpl implements PullRequestService {
     private final PullRequestRepository pullRequestRepository;
     private final CommitRepository commitRepository;
     private final CommitAnalysisRepository commitAnalysisRepository;
+    private final RepoRepository repositoryRepository;
+    private final UserRepository userRepository;
 
-    public PullRequestServiceImpl(PullRequestRepository pullRequestRepository, CommitRepository commitRepository, CommitAnalysisRepository commitAnalysisRepository) {
+    public PullRequestServiceImpl(PullRequestRepository pullRequestRepository, CommitRepository commitRepository, CommitAnalysisRepository commitAnalysisRepository, RepoRepository repositoryRepository, UserRepository userRepository) {
         this.pullRequestRepository = pullRequestRepository;
         this.commitRepository = commitRepository;
         this.commitAnalysisRepository = commitAnalysisRepository;
+        this.repositoryRepository = repositoryRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -57,20 +59,20 @@ public class PullRequestServiceImpl implements PullRequestService {
     public PullRequest saveFromPR(PullRequestWithAnalysisDto model) {
 
         PullRequest pr = new PullRequest();
-        pr.setId(System.currentTimeMillis()); // ID stratejinizi ileride değiştirmek mantıklı olabilir
+        pr.setId(System.currentTimeMillis());
 
-        // Branch bilgisi
+        // Branch & Pusher
         String[] branchParts = model.getModel().getRef().split("/");
         pr.setBranch(branchParts[branchParts.length - 1]);
         pr.setPusher(model.getModel().getPusher().getName());
 
-        // Head commit bilgisi
+        // Head Commit
         if (model.getModel().getHead_commit() != null) {
             pr.setHeadCommitMessage(model.getModel().getHead_commit().getMessage());
             pr.setHeadCommitSha(model.getModel().getHead_commit().getId());
         }
 
-        // Commit listesi
+        // Commits
         List<Commit> commits = new ArrayList<>();
         if (model.getModel().getCommits() != null) {
             for (com.api.devsync.model.fromWebhook.Commit c : model.getModel().getCommits()) {
@@ -81,45 +83,53 @@ public class PullRequestServiceImpl implements PullRequestService {
                         })
                         .orElseGet(() -> new Commit(c.getId(), c.getMessage()));
 
-                commit.setPullRequest(pr); // ilişkiyi kur
+                commit.setPullRequest(pr);
                 commits.add(commit);
             }
         }
         pr.setCommitCount(commits.size());
         pr.setCommits(commits);
 
-        // User bilgisi
+        // User (find-or-create)
         if (model.getModel().getSender() != null) {
             Sender sender = model.getModel().getSender();
-            User user = new User();
-            user.setGithubId(sender.getId());
+            User user = userRepository.findById(sender.getId())
+                    .orElseGet(() -> {
+                        User u = new User();
+                        u.setGithubId(sender.getId());
+                        return u;
+                    });
             user.setUsername(sender.getLogin());
             user.setAvatarUrl(sender.getAvatar_url());
             user.setUserType(sender.getType());
             pr.setCreatedBy(user);
         }
 
-        pr.setRepository(buildRepository(model));
+        // Repository (find-or-create)
+        com.api.devsync.model.fromWebhook.Repository repoDto = model.getModel().getRepository();
+        Repository repo = repositoryRepository.findById(repoDto.getId())
+                .orElseGet(() -> {
+                    Repository r = new Repository();
+                    r.setId(repoDto.getId());
+                    return r;
+                });
+        repo.setName(repoDto.getName());
+        repo.setFullName(repoDto.getFull_name());
+        repo.setHtmlUrl(repoDto.getHtml_url());
+        repo.setVisibility(repoDto.getVisibility());
+        repo.setLanguage(repoDto.getLanguage());
+        repo.setDescription(repoDto.getDescription());
+        repo.setDefaultBranch(repoDto.getDefault_branch());
+        repo.setOwnerLogin(repoDto.getOwner().getLogin());
+        repo.setOwnerId(repoDto.getOwner().getId());
+        pr.setRepository(repo);
 
+        // PullRequestAnalysis & CommitAnalyses
         setNodesAnalysis(pr, commits, model.getAnalyze());
 
         return pullRequestRepository.save(pr);
     }
 
-    private Repository buildRepository(PullRequestWithAnalysisDto dto) {
-        Repository repo = new Repository();
-        repo.setId(dto.getModel().getRepository().getId());
-        repo.setName(dto.getModel().getRepository().getName());
-        repo.setFullName(dto.getModel().getRepository().getFull_name());
-        repo.setHtmlUrl(dto.getModel().getRepository().getHtml_url());
-        repo.setVisibility(dto.getModel().getRepository().getVisibility());
-        repo.setLanguage(dto.getModel().getRepository().getLanguage());
-        repo.setDescription(dto.getModel().getRepository().getDescription());
-        repo.setDefaultBranch(dto.getModel().getRepository().getDefault_branch());
-        repo.setOwnerLogin(dto.getModel().getRepository().getName());
-        repo.setOwnerId(dto.getModel().getRepository().getId());
-        return repo;
-    }
 
     private void setNodesAnalysis(PullRequest pr, List<Commit> commits, PullRequestAnalysisDto analyzeDto) {
         if (analyzeDto == null) return;

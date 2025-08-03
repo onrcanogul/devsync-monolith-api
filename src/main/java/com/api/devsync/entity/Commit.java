@@ -21,8 +21,7 @@ public class Commit {
     private PullRequest pullRequest;
 
     @OneToOne
-    @MapsId
-    @JoinColumn(name = "hash")
+    @JoinColumn(name = "hash", referencedColumnName = "hash")
     private CommitAnalysis analysis;
 
     public Commit(String hash, String message) {

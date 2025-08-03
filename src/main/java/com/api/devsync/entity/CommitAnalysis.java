@@ -14,6 +14,7 @@ public class CommitAnalysis extends Analyze {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Column(name = "hash")
     private String hash;
     private String message;
     @ManyToOne

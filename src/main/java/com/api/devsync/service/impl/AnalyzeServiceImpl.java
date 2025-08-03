@@ -72,8 +72,7 @@ public class AnalyzeServiceImpl implements AnalyzeService {
     public PullRequestAnalysisDto createAnalyze(GithubWebhookModel model) throws JsonProcessingException {
         PullRequestAnalysis analyze = customPullRequestAnalyzeMapper.mapFromDto(model);
         getAnalyzeFromAI(analyze, model);
-        PullRequestAnalysis createdAnalyze = repository.save(analyze);
-        return pullRequestAnalyzeMapper.toDto(createdAnalyze);
+        return pullRequestAnalyzeMapper.toDto(analyze);
     }
 
     private void getAnalyzeFromAI(PullRequestAnalysis analyze, GithubWebhookModel model) throws JsonProcessingException {

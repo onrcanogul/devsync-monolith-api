@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Commit {
     @Id
-    private String hash;
+    private String id;
     private String message;
 
     @ManyToOne
@@ -26,7 +26,7 @@ public class Commit {
     private CommitAnalysis analysis;
 
     public Commit(String hash, String message) {
-        this.hash = hash;
+        this.id = hash;
         this.message = message;
     }
 }

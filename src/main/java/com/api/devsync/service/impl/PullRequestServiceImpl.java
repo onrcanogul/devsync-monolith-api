@@ -132,7 +132,7 @@ public class PullRequestServiceImpl implements PullRequestService {
                 .collect(Collectors.toMap(CommitAnalysisDto::getHash, Function.identity()));
 
         pr.getCommits().forEach(commitNode -> {
-            CommitAnalysisDto analysis = commitAnalysisMap.get(commitNode.getHash());
+            CommitAnalysisDto analysis = commitAnalysisMap.get(commitNode.getId());
             if (analysis != null) {
                 CommitAnalysis commitAnalysis = commitAnalysisRepository.findByHash(analysis.getHash())
                         .map(existing -> {

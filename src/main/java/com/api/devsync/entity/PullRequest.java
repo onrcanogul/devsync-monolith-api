@@ -22,18 +22,18 @@ public class PullRequest {
     private String headCommitSha;
     private int commitCount;
 
-    @OneToMany(mappedBy = "pullRequest")
+    @OneToMany(mappedBy = "pullRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Commit> commits;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "analysis_id", referencedColumnName = "id")
     private PullRequestAnalysis analysis;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "createdBy_id")
     private User createdBy;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "repository_id")
     private Repository repository;
 }

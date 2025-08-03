@@ -5,6 +5,7 @@ import com.api.devsync.exception.NotFoundException;
 import com.api.devsync.model.dto.CommitAnalysisDto;
 import com.api.devsync.model.dto.PullRequestAnalysisDto;
 import com.api.devsync.model.dto.PullRequestWithAnalysisDto;
+import com.api.devsync.model.fromWebhook.Sender;
 import com.api.devsync.repository.PullRequestRepository;
 import com.api.devsync.service.PullRequestService;
 import org.springframework.stereotype.Service;
@@ -69,10 +70,11 @@ public class PullRequestServiceImpl implements PullRequestService {
         }
         if (dto.getModel().getSender() != null) {
             User user = new User();
-            user.setGithubId(dto.getModel().getSender().getId());
-            user.setUsername(dto.getModel().getSender().getLogin());
-            user.setAvatarUrl(dto.getModel().getSender().getAvatar_url());
-            user.setUserType(dto.getModel().getSender().getType());
+            Sender sender = dto.getModel().getSender();
+            user.setGithubId(sender.getId());
+            user.setUsername(sender.getLogin());
+            user.setAvatarUrl(sender.getAvatar_url());
+            user.setUserType(sender.getType());
             pr.setCreatedBy(user);
         }
 

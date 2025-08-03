@@ -11,6 +11,7 @@ import com.api.devsync.service.PullRequestService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +127,7 @@ public class PullRequestServiceImpl implements PullRequestService {
 
         // PullRequestAnalysis & CommitAnalyses
         setNodesAnalysis(pr, commits, model.getAnalyze());
+        pr.setAnalyzedDate(LocalDateTime.now());
 
         return pullRequestRepository.save(pr);
     }

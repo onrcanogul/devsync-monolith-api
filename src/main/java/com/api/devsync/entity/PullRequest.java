@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,4 +42,6 @@ public class PullRequest {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "repository_id")
     private Repository repository;
+
+    private LocalDateTime analyzedDate;
 }

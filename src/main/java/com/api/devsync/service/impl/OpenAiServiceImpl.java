@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class OpenAiServiceImpl {
+public class OpenAiServiceImpl implements AIService {
 
     private final OpenAiService service ;
 

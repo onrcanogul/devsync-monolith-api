@@ -28,7 +28,7 @@ public class PullRequestAnalyzerServiceServiceImpl implements PullRequestAnalyze
 
     public AnalyzeAIDto analyze(GithubWebhookModel model) throws JsonProcessingException {
         String prompt = Prompts.analyzePrompt(objectMapper.writeValueAsString(model));
-        String answer = aiService.send("gpt-3.5-turbo-instruct", prompt);
+        String answer = aiService.send("gpt-4o-mini", prompt);
         log.info("answer: {}", answer);
         return deserialize(answer);
     }

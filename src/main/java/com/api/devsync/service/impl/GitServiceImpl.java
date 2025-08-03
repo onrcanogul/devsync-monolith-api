@@ -36,7 +36,6 @@ public class GitServiceImpl implements GitService {
         this.pullRequestService = pullRequestService;
     }
 
-    @Transactional
     @Override
     public void handlePullRequest(GithubWebhookModel model) throws JsonProcessingException {
         PullRequestAnalysisDto analyze = analyzeService.createAnalyze(model);

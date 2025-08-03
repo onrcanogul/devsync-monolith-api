@@ -14,15 +14,14 @@ import lombok.Setter;
 public class Commit {
     @Id
     private String hash;
+
     private String message;
 
     @ManyToOne
     @JoinColumn(name = "pull_request_id")
     private PullRequest pullRequest;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "hash", referencedColumnName = "hash", insertable = false, updatable = false)
+    @OneToOne(mappedBy = "commit", cascade = CascadeType.ALL, orphanRemoval = true)
     private CommitAnalysis analysis;
 
     public Commit(String hash, String message) {

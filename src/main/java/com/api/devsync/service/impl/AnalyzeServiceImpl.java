@@ -34,8 +34,9 @@ public class AnalyzeServiceImpl implements AnalyzeService {
     private final PullRequestAnalyzeMapper pullRequestAnalyzeMapper;
     private final CommitRepository commitRepository;
     private final CommitAnalysisRepository commitAnalysisRepository;
+    private final PullRequestAnalyzerServiceServiceImpl pullRequestAnalyzerServiceServiceImpl;
 
-    public AnalyzeServiceImpl(PullRequestAnalysisRepository repository, AnalyzeMapper analyzeMapper, PullRequestAnalyzerService pullRequestAnalyzerService, CustomPullRequestAnalyzeMapper customPullRequestAnalyzeMapper, PullRequestAnalyzeMapper pullRequestAnalyzeMapper, CommitRepository commitRepository, CommitAnalysisRepository commitAnalysisRepository) {
+    public AnalyzeServiceImpl(PullRequestAnalysisRepository repository, AnalyzeMapper analyzeMapper, PullRequestAnalyzerService pullRequestAnalyzerService, CustomPullRequestAnalyzeMapper customPullRequestAnalyzeMapper, PullRequestAnalyzeMapper pullRequestAnalyzeMapper, CommitRepository commitRepository, CommitAnalysisRepository commitAnalysisRepository, PullRequestAnalyzerServiceServiceImpl pullRequestAnalyzerServiceServiceImpl) {
         this.repository = repository;
         this.analyzeMapper = analyzeMapper;
         this.pullRequestAnalyzerService = pullRequestAnalyzerService;
@@ -43,6 +44,7 @@ public class AnalyzeServiceImpl implements AnalyzeService {
         this.pullRequestAnalyzeMapper = pullRequestAnalyzeMapper;
         this.commitRepository = commitRepository;
         this.commitAnalysisRepository = commitAnalysisRepository;
+        this.pullRequestAnalyzerServiceServiceImpl = pullRequestAnalyzerServiceServiceImpl;
     }
 
     public List<AnalyzeDto> get(int page, int size) {
@@ -75,7 +77,7 @@ public class AnalyzeServiceImpl implements AnalyzeService {
     }
 
     private void getAnalyzeFromAI(PullRequestAnalysis analyze, GithubWebhookModel model) throws JsonProcessingException {
-        AnalyzeAIDto analyzedPullRequest = getMockAnalyzeAIDto(model);
+        AnalyzeAIDto analyzedPullRequest = pullRequestAnalyzerServiceServiceImpl.analyze(model);
 
         analyze.setTechnicalComment(analyzedPullRequest.getPullRequestAnalysis().getTechnicalComment());
         analyze.setFunctionalComment(analyzedPullRequest.getPullRequestAnalysis().getFunctionalComment());

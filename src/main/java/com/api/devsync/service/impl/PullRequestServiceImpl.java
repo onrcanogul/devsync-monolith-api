@@ -6,6 +6,7 @@ import com.api.devsync.model.dto.CommitAnalysisDto;
 import com.api.devsync.model.dto.PullRequestAnalysisDto;
 import com.api.devsync.model.dto.PullRequestWithAnalysisDto;
 import com.api.devsync.model.fromWebhook.Sender;
+import com.api.devsync.repository.CommitAnalysisRepository;
 import com.api.devsync.repository.CommitRepository;
 import com.api.devsync.repository.PullRequestRepository;
 import com.api.devsync.service.PullRequestService;
@@ -20,10 +21,12 @@ import java.util.stream.Collectors;
 public class PullRequestServiceImpl implements PullRequestService {
     private final PullRequestRepository pullRequestRepository;
     private final CommitRepository commitRepository;
+    private final CommitAnalysisRepository commitAnalysisRepository;
 
-    public PullRequestServiceImpl(PullRequestRepository pullRequestRepository, CommitRepository commitRepository) {
+    public PullRequestServiceImpl(PullRequestRepository pullRequestRepository, CommitRepository commitRepository, CommitAnalysisRepository commitAnalysisRepository) {
         this.pullRequestRepository = pullRequestRepository;
         this.commitRepository = commitRepository;
+        this.commitAnalysisRepository = commitAnalysisRepository;
     }
 
     @Override
@@ -123,20 +126,35 @@ public class PullRequestServiceImpl implements PullRequestService {
         pullRequestAnalysis.setArchitecturalComment(analyzeDto.getArchitecturalComment());
         pullRequestAnalysis.setTechnicalComment(analyzeDto.getTechnicalComment());
         pr.setAnalysis(pullRequestAnalysis);
+
         Map<String, CommitAnalysisDto> commitAnalysisMap = analyzeDto.getCommitAnalysis()
                 .stream()
                 .collect(Collectors.toMap(CommitAnalysisDto::getHash, Function.identity()));
+
         pr.getCommits().forEach(commitNode -> {
             CommitAnalysisDto analysis = commitAnalysisMap.get(commitNode.getHash());
             if (analysis != null) {
-                CommitAnalysis commitAnalysis = new CommitAnalysis();
-                commitAnalysis.setHash(analysis.getHash());
-                commitAnalysis.setRiskScore(analysis.getRiskScore());
-                commitAnalysis.setTechnicalComment(analysis.getTechnicalComment());
-                commitAnalysis.setArchitecturalComment(analysis.getArchitecturalComment());
-                commitAnalysis.setFunctionalComment(analysis.getFunctionalComment());
+                CommitAnalysis commitAnalysis = commitAnalysisRepository.findByHash(analysis.getHash())
+                        .map(existing -> {
+                            existing.setRiskScore(analysis.getRiskScore());
+                            existing.setTechnicalComment(analysis.getTechnicalComment());
+                            existing.setArchitecturalComment(analysis.getArchitecturalComment());
+                            existing.setFunctionalComment(analysis.getFunctionalComment());
+                            return existing;
+                        })
+                        .orElseGet(() -> {
+                            CommitAnalysis ca = new CommitAnalysis();
+                            ca.setHash(analysis.getHash());
+                            ca.setRiskScore(analysis.getRiskScore());
+                            ca.setTechnicalComment(analysis.getTechnicalComment());
+                            ca.setArchitecturalComment(analysis.getArchitecturalComment());
+                            ca.setFunctionalComment(analysis.getFunctionalComment());
+                            return ca;
+                        });
+
                 commitNode.setAnalysis(commitAnalysis);
             }
         });
     }
+
 }

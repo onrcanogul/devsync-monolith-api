@@ -1,5 +1,6 @@
 package com.api.devsync.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +27,8 @@ public class PullRequest {
     private int commitCount;
 
     @OneToMany(mappedBy = "pullRequest", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Commit> commits = new ArrayList<>();
+    @JsonManagedReference
+    private List<Commit> commits;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "analysis_id", referencedColumnName = "id")

@@ -11,9 +11,12 @@ import com.api.devsync.repository.CommitRepository;
 import com.api.devsync.repository.PullRequestRepository;
 import com.api.devsync.service.PullRequestService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -50,43 +53,45 @@ public class PullRequestServiceImpl implements PullRequestService {
     }
 
     @Override
+    @Transactional
     public PullRequest saveFromPR(PullRequestWithAnalysisDto model) {
+
         PullRequest pr = new PullRequest();
-        fillPrNode(pr, model);
-        return pullRequestRepository.save(pr);
-    }
+        pr.setId(System.currentTimeMillis()); // ID stratejinizi ileride değiştirmek mantıklı olabilir
 
-    private void fillPrNode(PullRequest pr, PullRequestWithAnalysisDto dto) {
-        pr.setId(System.currentTimeMillis());
+        // Branch bilgisi
+        String[] branchParts = model.getModel().getRef().split("/");
+        pr.setBranch(branchParts[branchParts.length - 1]);
+        pr.setPusher(model.getModel().getPusher().getName());
 
-        String[] branchParts = dto.getModel().getRef().split("/");
-        String branch = branchParts[branchParts.length - 1];
-        pr.setBranch(branch);
-        pr.setPusher(dto.getModel().getPusher().getName());
-
-        if (dto.getModel().getHead_commit() != null) {
-            pr.setHeadCommitMessage(dto.getModel().getHead_commit().getMessage());
-            pr.setHeadCommitSha(dto.getModel().getHead_commit().getId());
+        // Head commit bilgisi
+        if (model.getModel().getHead_commit() != null) {
+            pr.setHeadCommitMessage(model.getModel().getHead_commit().getMessage());
+            pr.setHeadCommitSha(model.getModel().getHead_commit().getId());
         }
 
-        pr.setCommitCount(dto.getModel().getCommits() != null ? dto.getModel().getCommits().size() : 0);
+        // Commit listesi
+        List<Commit> commits = new ArrayList<>();
+        if (model.getModel().getCommits() != null) {
+            for (com.api.devsync.model.fromWebhook.Commit c : model.getModel().getCommits()) {
+                Commit commit = commitRepository.findById(c.getId())
+                        .map(existing -> {
+                            existing.setMessage(c.getMessage());
+                            return existing;
+                        })
+                        .orElseGet(() -> new Commit(c.getId(), c.getMessage()));
 
-        if (dto.getModel().getCommits() != null) {
-            List<Commit> commits = dto.getModel().getCommits().stream()
-                    .map(c -> commitRepository.findById(c.getId())
-                            .map(existing -> {
-                                existing.setMessage(c.getMessage());
-                                return existing;
-                            })
-                            .orElseGet(() -> new Commit(c.getId(), c.getMessage()))
-                    )
-                    .toList();
-            pr.setCommits(commits);
+                commit.setPullRequest(pr); // ilişkiyi kur
+                commits.add(commit);
+            }
         }
+        pr.setCommitCount(commits.size());
+        pr.setCommits(commits);
 
-        if (dto.getModel().getSender() != null) {
+        // User bilgisi
+        if (model.getModel().getSender() != null) {
+            Sender sender = model.getModel().getSender();
             User user = new User();
-            Sender sender = dto.getModel().getSender();
             user.setGithubId(sender.getId());
             user.setUsername(sender.getLogin());
             user.setAvatarUrl(sender.getAvatar_url());
@@ -94,68 +99,68 @@ public class PullRequestServiceImpl implements PullRequestService {
             pr.setCreatedBy(user);
         }
 
-        Repository repository = getRepository(dto);
-        pr.setRepository(repository);
+        pr.setRepository(buildRepository(model));
 
-        setNodesAnalysis(pr, dto);
+        setNodesAnalysis(pr, commits, model.getAnalyze());
+
+        return pullRequestRepository.save(pr);
     }
 
-
-    private static Repository getRepository(PullRequestWithAnalysisDto dto) {
-        Repository repository = new Repository();
-        repository.setId(dto.getModel().getRepository().getId());
-        repository.setName(dto.getModel().getRepository().getName());
-        repository.setFullName(dto.getModel().getRepository().getFull_name());
-        repository.setHtmlUrl(dto.getModel().getRepository().getHtml_url());
-        repository.setVisibility(dto.getModel().getRepository().getVisibility());
-        repository.setLanguage(dto.getModel().getRepository().getLanguage());
-        repository.setDescription(dto.getModel().getRepository().getDescription());
-        repository.setDefaultBranch(dto.getModel().getRepository().getDefault_branch());
-        repository.setOwnerLogin(dto.getModel().getRepository().getName());
-        repository.setOwnerId(dto.getModel().getRepository().getId());
-        return repository;
+    private Repository buildRepository(PullRequestWithAnalysisDto dto) {
+        Repository repo = new Repository();
+        repo.setId(dto.getModel().getRepository().getId());
+        repo.setName(dto.getModel().getRepository().getName());
+        repo.setFullName(dto.getModel().getRepository().getFull_name());
+        repo.setHtmlUrl(dto.getModel().getRepository().getHtml_url());
+        repo.setVisibility(dto.getModel().getRepository().getVisibility());
+        repo.setLanguage(dto.getModel().getRepository().getLanguage());
+        repo.setDescription(dto.getModel().getRepository().getDescription());
+        repo.setDefaultBranch(dto.getModel().getRepository().getDefault_branch());
+        repo.setOwnerLogin(dto.getModel().getRepository().getName());
+        repo.setOwnerId(dto.getModel().getRepository().getId());
+        return repo;
     }
 
-    private void setNodesAnalysis(PullRequest pr, PullRequestWithAnalysisDto model) {
-        PullRequestAnalysisDto analyzeDto = model.getAnalyze();
+    private void setNodesAnalysis(PullRequest pr, List<Commit> commits, PullRequestAnalysisDto analyzeDto) {
         if (analyzeDto == null) return;
 
-        PullRequestAnalysis pullRequestAnalysis = new PullRequestAnalysis();
-        pullRequestAnalysis.setFunctionalComment(analyzeDto.getFunctionalComment());
-        pullRequestAnalysis.setRiskScore(analyzeDto.getRiskScore());
-        pullRequestAnalysis.setArchitecturalComment(analyzeDto.getArchitecturalComment());
-        pullRequestAnalysis.setTechnicalComment(analyzeDto.getTechnicalComment());
-        pr.setAnalysis(pullRequestAnalysis);
+        PullRequestAnalysis prAnalysis = new PullRequestAnalysis();
+        prAnalysis.setFunctionalComment(analyzeDto.getFunctionalComment());
+        prAnalysis.setRiskScore(analyzeDto.getRiskScore());
+        prAnalysis.setArchitecturalComment(analyzeDto.getArchitecturalComment());
+        prAnalysis.setTechnicalComment(analyzeDto.getTechnicalComment());
+        pr.setAnalysis(prAnalysis);
 
         Map<String, CommitAnalysisDto> commitAnalysisMap = analyzeDto.getCommitAnalysis()
                 .stream()
                 .collect(Collectors.toMap(CommitAnalysisDto::getId, Function.identity()));
 
-        pr.getCommits().forEach(commitNode -> {
-            CommitAnalysisDto analysis = commitAnalysisMap.get(commitNode.getHash());
-            if (analysis != null) {
-                CommitAnalysis commitAnalysis = commitAnalysisRepository.findById(analysis.getId())
+        for (Commit commit : commits) {
+            CommitAnalysisDto analysisDto = commitAnalysisMap.get(commit.getHash());
+            if (analysisDto != null) {
+                CommitAnalysis analysis = commitAnalysisRepository.findById(analysisDto.getId())
                         .map(existing -> {
-                            existing.setRiskScore(analysis.getRiskScore());
-                            existing.setTechnicalComment(analysis.getTechnicalComment());
-                            existing.setArchitecturalComment(analysis.getArchitecturalComment());
-                            existing.setFunctionalComment(analysis.getFunctionalComment());
+                            existing.setRiskScore(analysisDto.getRiskScore());
+                            existing.setTechnicalComment(analysisDto.getTechnicalComment());
+                            existing.setArchitecturalComment(analysisDto.getArchitecturalComment());
+                            existing.setFunctionalComment(analysisDto.getFunctionalComment());
                             return existing;
                         })
                         .orElseGet(() -> {
-                            CommitAnalysis ca = new CommitAnalysis();;
-                            ca.setId(analysis.getId());
-                            ca.setCommit(analysis.getCommit());
-                            ca.setRiskScore(analysis.getRiskScore());
-                            ca.setTechnicalComment(analysis.getTechnicalComment());
-                            ca.setArchitecturalComment(analysis.getArchitecturalComment());
-                            ca.setFunctionalComment(analysis.getFunctionalComment());
+                            CommitAnalysis ca = new CommitAnalysis();
+                            ca.setId(UUID.randomUUID().toString());
+                            ca.setCommit(commit);
+                            ca.setRiskScore(analysisDto.getRiskScore());
+                            ca.setTechnicalComment(analysisDto.getTechnicalComment());
+                            ca.setArchitecturalComment(analysisDto.getArchitecturalComment());
+                            ca.setFunctionalComment(analysisDto.getFunctionalComment());
                             return ca;
                         });
 
-                commitNode.setAnalysis(commitAnalysis);
+                commit.setAnalysis(analysis);
             }
-        });
+        }
     }
+
 
 }

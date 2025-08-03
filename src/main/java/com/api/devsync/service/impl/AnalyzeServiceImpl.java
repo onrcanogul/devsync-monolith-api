@@ -76,7 +76,7 @@ public class AnalyzeServiceImpl implements AnalyzeService {
         analyze.setArchitecturalComment(analyzedPullRequest.getPullRequestAnalysis().getTechnicalComment());
         analyze.setCommitAnalysis(analyzedPullRequest.getCommitAnalyses().stream().map(c -> {
             CommitAnalysis newAnalyze = new CommitAnalysis();
-            newAnalyze.setHash(c.getHash());
+            newAnalyze.setId(c.getHash());
             newAnalyze.setFunctionalComment(c.getFunctionalComment());
             newAnalyze.setArchitecturalComment(c.getArchitecturalComment());
             newAnalyze.setTechnicalComment(c.getTechnicalComment());

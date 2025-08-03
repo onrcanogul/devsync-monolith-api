@@ -30,13 +30,6 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-//                        .requestMatchers("/api/git/**").authenticated()
-//                        .requestMatchers("/api/analyze/**").authenticated()
-//                        .requestMatchers("/api/commit/**").authenticated()
-//                        .requestMatchers("/api/pull-request/**").authenticated()
-//                        .requestMatchers("/api/commit/**").authenticated()
-//                        .requestMatchers("/api/repository/**").authenticated()
-//                        .requestMatchers("api/git-webhook/**").authenticated()
                         .anyRequest().authenticated()
                 ).addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 

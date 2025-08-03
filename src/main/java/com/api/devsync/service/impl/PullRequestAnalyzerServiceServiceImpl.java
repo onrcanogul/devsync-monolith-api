@@ -8,11 +8,13 @@ import com.api.devsync.service.PullRequestAnalyzerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 public class PullRequestAnalyzerServiceServiceImpl implements PullRequestAnalyzerService {
 
@@ -27,6 +29,7 @@ public class PullRequestAnalyzerServiceServiceImpl implements PullRequestAnalyze
     public AnalyzeAIDto analyze(GithubWebhookModel model) throws JsonProcessingException {
         String prompt = Prompts.analyzePrompt(objectMapper.writeValueAsString(model));
         String answer = aiService.send("gpt-3.5-turbo-instruct", prompt);
+        log.info("answer: {}", answer);
         return deserialize(answer);
     }
 

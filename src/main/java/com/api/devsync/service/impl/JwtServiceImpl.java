@@ -46,8 +46,8 @@ public class JwtServiceImpl implements JwtService {
                 .parseClaimsJws(token).getBody().getSubject();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        return extractUsername(token).equals(userDetails.getUsername()) &&
+    public boolean isTokenValid(String token, String username) {
+        return extractUsername(token).equals(username) &&
                 !isTokenExpired(token);
     }
 

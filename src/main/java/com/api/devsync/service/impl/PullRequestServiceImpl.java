@@ -143,8 +143,9 @@ public class PullRequestServiceImpl implements PullRequestService {
                             return existing;
                         })
                         .orElseGet(() -> {
-                            CommitAnalysis ca = new CommitAnalysis();
+                            CommitAnalysis ca = new CommitAnalysis();;
                             ca.setId(analysis.getId());
+                            ca.setCommit(analysis.getCommit());
                             ca.setRiskScore(analysis.getRiskScore());
                             ca.setTechnicalComment(analysis.getTechnicalComment());
                             ca.setArchitecturalComment(analysis.getArchitecturalComment());

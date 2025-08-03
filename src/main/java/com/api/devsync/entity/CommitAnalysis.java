@@ -9,15 +9,16 @@ import lombok.Setter;
 @Setter
 @Table(name = "commit_analysis")
 public class CommitAnalysis extends Analyze {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private String id;
 
     private String message;
 
     @OneToOne
-    @MapsId
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "commit_hash", referencedColumnName = "hash")
     private Commit commit;
 
     @ManyToOne

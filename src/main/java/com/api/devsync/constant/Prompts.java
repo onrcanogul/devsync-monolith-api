@@ -40,7 +40,11 @@ public class Prompts {
           "technicalComment": "Your PR-level technical analysis...",
           "functionalComment": "Your PR-level functional analysis...",
           "architecturalComment": "Your PR-level architectural analysis..."
-          "commitRiskScore": 0-100
+          "commitRiskScore": 0-100,
+          "commit" : 
+          {
+            "hash": "commit hash here"
+          }
         },
         ...
       ]

@@ -10,8 +10,7 @@ import lombok.Setter;
 @Table(name = "commit-analysis")
 public class CommitAnalysis extends Analyze {
     @Id
-    @Column(name = "hash")
-    private String hash;
+    private String id;
     private String message;
     @ManyToOne
     @JoinColumn(name = "pull_request_analyze_id")

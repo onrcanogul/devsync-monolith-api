@@ -132,9 +132,9 @@ public class PullRequestServiceImpl implements PullRequestService {
                 .collect(Collectors.toMap(CommitAnalysisDto::getHash, Function.identity()));
 
         pr.getCommits().forEach(commitNode -> {
-            CommitAnalysisDto analysis = commitAnalysisMap.get(commitNode.getId());
+            CommitAnalysisDto analysis = commitAnalysisMap.get(commitNode.getHash());
             if (analysis != null) {
-                CommitAnalysis commitAnalysis = commitAnalysisRepository.findByHash(analysis.getHash())
+                CommitAnalysis commitAnalysis = commitAnalysisRepository.findById(analysis.getHash())
                         .map(existing -> {
                             existing.setRiskScore(analysis.getRiskScore());
                             existing.setTechnicalComment(analysis.getTechnicalComment());
@@ -144,7 +144,7 @@ public class PullRequestServiceImpl implements PullRequestService {
                         })
                         .orElseGet(() -> {
                             CommitAnalysis ca = new CommitAnalysis();
-                            ca.setHash(analysis.getHash());
+                            ca.setId(analysis.getHash());
                             ca.setRiskScore(analysis.getRiskScore());
                             ca.setTechnicalComment(analysis.getTechnicalComment());
                             ca.setArchitecturalComment(analysis.getArchitecturalComment());

@@ -6,6 +6,7 @@ import com.api.devsync.model.dto.CommitAnalysisDto;
 import com.api.devsync.model.dto.PullRequestAnalysisDto;
 import com.api.devsync.model.dto.PullRequestWithAnalysisDto;
 import com.api.devsync.model.fromWebhook.Sender;
+import com.api.devsync.repository.CommitRepository;
 import com.api.devsync.repository.PullRequestRepository;
 import com.api.devsync.service.PullRequestService;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,11 @@ import java.util.stream.Collectors;
 @Service
 public class PullRequestServiceImpl implements PullRequestService {
     private final PullRequestRepository pullRequestRepository;
+    private final CommitRepository commitRepository;
 
-    public PullRequestServiceImpl(PullRequestRepository pullRequestRepository) {
+    public PullRequestServiceImpl(PullRequestRepository pullRequestRepository, CommitRepository commitRepository) {
         this.pullRequestRepository = pullRequestRepository;
+        this.commitRepository = commitRepository;
     }
 
     @Override
@@ -52,22 +55,32 @@ public class PullRequestServiceImpl implements PullRequestService {
 
     private void fillPrNode(PullRequest pr, PullRequestWithAnalysisDto dto) {
         pr.setId(System.currentTimeMillis());
+
         String[] branchParts = dto.getModel().getRef().split("/");
         String branch = branchParts[branchParts.length - 1];
         pr.setBranch(branch);
         pr.setPusher(dto.getModel().getPusher().getName());
+
         if (dto.getModel().getHead_commit() != null) {
             pr.setHeadCommitMessage(dto.getModel().getHead_commit().getMessage());
             pr.setHeadCommitSha(dto.getModel().getHead_commit().getId());
         }
+
         pr.setCommitCount(dto.getModel().getCommits() != null ? dto.getModel().getCommits().size() : 0);
+
         if (dto.getModel().getCommits() != null) {
-            pr.setCommits(
-                    dto.getModel().getCommits().stream()
-                            .map(c -> new Commit(c.getId(), c.getMessage()))
-                            .toList()
-            );
+            List<Commit> commits = dto.getModel().getCommits().stream()
+                    .map(c -> commitRepository.findById(c.getId())
+                            .map(existing -> {
+                                existing.setMessage(c.getMessage());
+                                return existing;
+                            })
+                            .orElseGet(() -> new Commit(c.getId(), c.getMessage()))
+                    )
+                    .toList();
+            pr.setCommits(commits);
         }
+
         if (dto.getModel().getSender() != null) {
             User user = new User();
             Sender sender = dto.getModel().getSender();
@@ -80,8 +93,10 @@ public class PullRequestServiceImpl implements PullRequestService {
 
         Repository repository = getRepository(dto);
         pr.setRepository(repository);
+
         setNodesAnalysis(pr, dto);
     }
+
 
     private static Repository getRepository(PullRequestWithAnalysisDto dto) {
         Repository repository = new Repository();

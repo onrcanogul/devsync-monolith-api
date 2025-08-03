@@ -1,5 +1,6 @@
 package com.api.devsync.model.dto;
 
+import com.api.devsync.entity.PullRequest;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,6 @@ import java.util.UUID;
 @Setter
 public class PullRequestAnalysisDto extends AnalyzeDto {
     private UUID id;
-    private long pullRequestId;
+    private PullRequest pullRequest;
     private List<CommitAnalysisDto> commitAnalysis = new ArrayList<>();
 }

@@ -49,7 +49,7 @@ public class GitServiceImpl implements GitService {
     public List<RepositoryFromApi> getRepositories(String username) {
         String githubAccessToken = githubTokenRepository.findByUsername(username).orElseThrow(
                 () -> new NotFoundException("githubTokenNotFound")).getToken();
-        return gitApiClient.getUsersRepositories(githubAccessToken, AppConstants.webhookUrl);
+        return gitApiClient.getUsersRepositories(username, githubAccessToken, AppConstants.webhookUrl);
     }
 
     @Override

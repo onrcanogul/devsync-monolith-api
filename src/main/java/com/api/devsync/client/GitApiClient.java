@@ -26,9 +26,9 @@ public class GitApiClient {
                 .build();
     }
 
-    public List<RepositoryFromApi> getUsersRepositories(String accessToken, String targetWebhookUrl) {
+    public List<RepositoryFromApi> getUsersRepositories(String username, String accessToken, String targetWebhookUrl) {
         return webClient.get()
-                .uri("https://api.github.com/user/repos")
+                .uri("https://api.github.com/users/{username}/repos", username)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
                 .bodyToFlux(RepositoryFromApi.class)

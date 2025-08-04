@@ -55,7 +55,7 @@ public class GitApiClient {
     public CommitResponseFromApi getCommit(String owner, String repo, String sha, String token) {
         return webClient.get()
                 .uri("/repos/{owner}/{repo}/commits/{sha}", owner, repo, sha)
-                .header("Authorization", "Bearer " + token)
+//                .header("Authorization", "Bearer " + token)
                 .header("Accept", "application/vnd.github.v3+json")
                 .retrieve()
                 .bodyToMono(CommitResponseFromApi.class)

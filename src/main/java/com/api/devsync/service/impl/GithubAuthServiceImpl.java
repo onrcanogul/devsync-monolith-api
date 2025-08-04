@@ -52,9 +52,7 @@ public class GithubAuthServiceImpl implements GithubAuthService {
         body.add("redirect_uri", "https://devsyncweb.site/oauth/callback");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-        log.info("request: " + request.getBody());
         ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-        log.info("response: {}", response.getBody());
         return (String) response.getBody().get("access_token");
     }
 

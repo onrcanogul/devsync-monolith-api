@@ -1,8 +1,8 @@
 package com.api.devsync.service;
 
 import com.api.devsync.model.dto.AnalyzeDto;
+import com.api.devsync.model.dto.PrepareAnalyzeDto;
 import com.api.devsync.model.dto.PullRequestAnalysisDto;
-import com.api.devsync.model.fromWebhook.GithubWebhookModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
@@ -13,5 +13,5 @@ public interface AnalyzeService {
     List<AnalyzeDto> getByRepository(Long repoId);
     AnalyzeDto getById(UUID id);
     AnalyzeDto getByPullRequest(Long pullRequestId);
-    PullRequestAnalysisDto createAnalyze(GithubWebhookModel model) throws JsonProcessingException;
+    PullRequestAnalysisDto createAnalyze(PrepareAnalyzeDto model) throws JsonProcessingException;
 }

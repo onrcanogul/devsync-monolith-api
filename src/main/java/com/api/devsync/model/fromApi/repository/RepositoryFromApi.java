@@ -1,4 +1,4 @@
-package com.api.devsync.model.fromApi;
+package com.api.devsync.model.fromApi.repository;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

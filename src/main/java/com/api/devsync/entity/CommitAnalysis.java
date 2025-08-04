@@ -14,7 +14,7 @@ public class CommitAnalysis extends Analyze {
     @Id
     @Column(name = "id")
     private String id;
-
+    private String author;
     private String message;
 
     @OneToOne

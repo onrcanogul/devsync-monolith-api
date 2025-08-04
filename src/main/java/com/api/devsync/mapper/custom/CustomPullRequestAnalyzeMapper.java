@@ -20,10 +20,6 @@ public class CustomPullRequestAnalyzeMapper {
         String branchName = refParts[refParts.length - 1];
         analyze.setBranch(branchName);
 
-//        analyze.setPullRequestId(0);
-
-        analyze.setAuthor(dto.getHead_commit().getAuthor().getName());
-
         analyze.setRepoId(dto.getRepository().getId());
         analyze.setRepoName(dto.getRepository().getName());
 

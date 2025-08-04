@@ -8,6 +8,7 @@ import lombok.Setter;
 public class CommitAIAnalyzeDto {
     private String hash;
     private String message;
+    private String author;
     private String technicalComment;
     private String functionalComment;
     private String architecturalComment;

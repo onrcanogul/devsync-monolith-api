@@ -10,5 +10,5 @@ public interface PullRequestService {
     List<PullRequest> getByUser(String username);
     List<PullRequest> get(Long repoId);
     PullRequest getById(Long id);
-    PullRequest saveFromPR(PullRequestWithAnalysisDto model);
+    void save(PullRequestWithAnalysisDto model);
 }

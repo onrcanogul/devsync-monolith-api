@@ -57,7 +57,7 @@ public class PullRequestServiceImpl implements PullRequestService {
 
     @Override
     @Transactional
-    public PullRequest saveFromPR(PullRequestWithAnalysisDto model) {
+    public void save(PullRequestWithAnalysisDto model) {
 
         PullRequest pr = new PullRequest();
         pr.setId(System.currentTimeMillis());
@@ -125,11 +125,10 @@ public class PullRequestServiceImpl implements PullRequestService {
         repo.setOwnerId(repoDto.getOwner().getId());
         pr.setRepository(repo);
 
-        // PullRequestAnalysis & CommitAnalyses
         setNodesAnalysis(pr, commits, model.getAnalyze());
         pr.setAnalyzedDate(LocalDateTime.now());
 
-        return pullRequestRepository.save(pr);
+        pullRequestRepository.save(pr);
     }
 
 

@@ -8,6 +8,7 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.service.OpenAiService;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -16,7 +17,7 @@ public class OpenAiServiceImpl implements AIService {
     private final OpenAiService service ;
 
     public OpenAiServiceImpl(OpenAIProperties openAIConfigurations) {
-        this.service = new OpenAiService(openAIConfigurations.getToken());
+        this.service = new OpenAiService(openAIConfigurations.getToken(), Duration.ofSeconds(300));
     }
 
     public String send(String llm, String prompt) {
@@ -26,7 +27,7 @@ public class OpenAiServiceImpl implements AIService {
                 .model(llm)
                 .messages(List.of(userMessage))
                 .temperature(0.7)
-                .maxTokens(512)
+                .maxTokens(4000)
                 .build();
 
         List<ChatCompletionChoice> choices = service.createChatCompletion(request).getChoices();

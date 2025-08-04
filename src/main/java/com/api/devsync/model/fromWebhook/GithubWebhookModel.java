@@ -1,6 +1,5 @@
 package com.api.devsync.model.fromWebhook;
 
-
 import lombok.Data;
 
 import java.util.List;

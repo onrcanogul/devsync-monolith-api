@@ -1,6 +1,6 @@
 package com.api.devsync.service;
 
-import com.api.devsync.model.fromApi.RepositoryFromApi;
+import com.api.devsync.model.fromApi.repository.RepositoryFromApi;
 import com.api.devsync.model.fromWebhook.GithubWebhookModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 

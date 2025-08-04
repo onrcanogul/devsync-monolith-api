@@ -1,6 +1,7 @@
 package com.api.devsync.client;
 
-import com.api.devsync.model.fromApi.RepositoryFromApi;
+import com.api.devsync.model.fromApi.commit.CommitResponseFromApi;
+import com.api.devsync.model.fromApi.repository.RepositoryFromApi;
 import com.api.devsync.model.fromWebhook.Repository;
 import com.api.devsync.properties.GitHubProperties;
 import org.springframework.core.ParameterizedTypeReference;
@@ -25,9 +26,9 @@ public class GitApiClient {
                 .build();
     }
 
-    public List<RepositoryFromApi> getUsersRepositories(String username, String accessToken, String targetWebhookUrl) {
+    public List<RepositoryFromApi> getUsersRepositories(String accessToken, String targetWebhookUrl) {
         return webClient.get()
-                .uri("https://api.github.com/users/{username}/repos", username)
+                .uri("https://api.github.com/user/repos")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
                 .bodyToFlux(RepositoryFromApi.class)
@@ -48,6 +49,16 @@ public class GitApiClient {
                                 })
                 )
                 .collectList()
+                .block();
+    }
+
+    public CommitResponseFromApi getCommit(String owner, String repo, String sha, String token) {
+        return webClient.get()
+                .uri("/repos/{owner}/{repo}/commits/{sha}", owner, repo, sha)
+                .header("Authorization", "Bearer " + token)
+                .header("Accept", "application/vnd.github.v3+json")
+                .retrieve()
+                .bodyToMono(CommitResponseFromApi.class)
                 .block();
     }
 
@@ -79,5 +90,7 @@ public class GitApiClient {
                 .doOnError(error -> System.err.println(error.getMessage()))
                 .block();
     }
+
+
 
 }

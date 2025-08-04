@@ -15,7 +15,6 @@ public class Analyze {
     private String repoName;
     private Long repoId;
     private String branch;
-    private String author;
     private int commitCount;
     private int fileChangeCount;
     private int totalAdditions;

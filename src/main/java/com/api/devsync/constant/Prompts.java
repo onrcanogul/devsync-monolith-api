@@ -1,39 +1,73 @@
 package com.api.devsync.constant;
 
 public class Prompts {
-    public static String analyzePrompt(String serializedObject){
+    public static String prAnalyzePrompt(String serializedObject){
         return """
-    You are a senior software architect and code reviewer.
-    
-    You are given a Pull Request JSON object, which includes a list of commits and associated Jira issues.
-    
-    Please perform a **two-level analysis**:
-    
-    1. **Pull Request Level Analysis**: \s
-       - Technical Quality \s
-       - Functional Impact \s
-       - Architectural Impact \s
-       - Assign an overall `riskScore` between 0-100
-    
-    2. **Commit Level Analysis**: \s
-       For each commit, provide: \s
-       - A short comment describing the commit’s intent and quality \s
-       - A `commitRiskScore` (0-100)
-    
-    ---
-    
-    ⚠️ Return **only** the following JSON structure and nothing else — no markdown, no preamble, no extra fields in json:
-    
-    Just give me the content of json like that, do not give anything else :
-    ```json
+You are a senior software architect and code reviewer.
+
+You are given a Pull Request JSON object, including:
+- Pull request metadata
+- Commits
+- File changes (diffs included)
+
+TASK:
+Analyze the PR and all commits, then respond ONLY in valid JSON.
+
+OUTPUT FORMAT:
+{
+  "pullRequestAnalysis": {
+    "riskScore": <integer 0-100>,
+    "technicalComment": "<detailed technical comment>",
+    "functionalComment": "<detailed functional comment>",
+    "architecturalComment": "<detailed architectural comment>"
+  },
+  "commitAnalyses": [
     {
-      "pullRequestAnalysis": {
-        "riskScore": 0-100,
-        "technicalComment": "Your PR-level technical analysis...",
-        "functionalComment": "Your PR-level functional analysis...",
-        "architecturalComment": "Your PR-level architectural analysis..."
-      },
-      "commitAnalyses": [
+      "hash": "<commit hash>",
+      "message": "<commit message>",
+      "author": "<author>",
+      "technicalComment": "<detailed technical comment>",
+      "functionalComment": "<detailed functional comment>",
+      "architecturalComment": "<detailed architectural comment>",
+      "riskScore": <integer 0-100>
+    }
+  ]
+}
+
+RULES:
+- Respond ONLY with valid JSON.
+- Do NOT truncate.
+- Ensure all arrays and objects are closed.
+- If input is too large, process commits in summarized form but keep JSON complete.
+
+INPUT:
+%s
+Pull Request:
+""" + serializedObject;
+    }
+
+
+    public static String commitAnalyzePrompt(String serializedObject){
+        return """
+You are a **senior software architect** reviewing a Pull Request (JSON includes commits and (more important!)full code changes).
+
+Perform **two-level analysis** strictly based on code and commit content:
+
+1. **Pull Request Level**:
+   - Technical Quality
+   - Functional Impact
+   - Architectural Impact
+   - Overall `riskScore` (0–100)
+
+2. **Commit Level** (for each commit):
+   - Short intent/quality comment
+   - `commitRiskScore` (0–100)
+
+⚠ **STRICT OUTPUT RULES**  
+- Respond **only** with raw JSON (no markdown, no text, no explanation)  
+- Output format (exact field names, no extra fields):
+
+"commitAnalyses": {
         {
           "hash": "commit hash here",
           "message": "commit message here",
@@ -47,12 +81,15 @@ public class Prompts {
           }
         },
         ...
-      ]
-    }
-    
-   Analyze the pull request. Respond **only** with a raw JSON object containing the fields `pullRequestAnalysis` and `commitAnalyses`. Do not include any explanation, text, or additional formatting. Just return the JSON.
-               
-    Pull Request:
-    """ + serializedObject;
+      }
+
+Analyze the PR and commits **including all provided code**.  
+Return **only JSON** in the exact schema above.  
+Return only valid JSON. Do not cut off mid-string. Ensure all quotes are closed.
+If output is too long, summarize commit list but keep valid JSON format.
+
+Pull Request:
+""" + serializedObject;
     }
 }
+

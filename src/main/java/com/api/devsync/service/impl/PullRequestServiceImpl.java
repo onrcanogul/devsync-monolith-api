@@ -151,12 +151,15 @@ public class PullRequestServiceImpl implements PullRequestService {
                             existing.setTechnicalComment(analysisDto.getTechnicalComment());
                             existing.setArchitecturalComment(analysisDto.getArchitecturalComment());
                             existing.setFunctionalComment(analysisDto.getFunctionalComment());
+                            existing.setCommit(commit);
+                            commit.setAnalysis(existing);
                             return existing;
                         })
                         .orElseGet(() -> {
                             CommitAnalysis ca = new CommitAnalysis();
                             ca.setId(UUID.randomUUID().toString());
                             ca.setCommit(commit);
+                            commit.setAnalysis(ca);
                             ca.setRiskScore(analysisDto.getRiskScore());
                             ca.setTechnicalComment(analysisDto.getTechnicalComment());
                             ca.setArchitecturalComment(analysisDto.getArchitecturalComment());

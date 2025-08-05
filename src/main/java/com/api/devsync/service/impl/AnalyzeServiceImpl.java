@@ -112,7 +112,7 @@ public class AnalyzeServiceImpl implements AnalyzeService {
                     CommitAnalysis commitAnalysis = commitAnalysisRepository.findById(dto.getHash())
                             .orElseGet(() -> {
                                 CommitAnalysis newCa = new CommitAnalysis();
-                                newCa.setId(UUID.randomUUID().toString());
+                                newCa.setId(dto.getHash());
                                 return newCa;
                             });
 

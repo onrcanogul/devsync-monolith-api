@@ -76,8 +76,8 @@ public class GitServiceImpl implements GitService {
 
 
     private PrepareAnalyzeDto setCommitDetails(GithubWebhookModel model) {
-        String githubAccessToken = githubTokenRepository.findByUsername(model.getSender().getLogin())
-                .orElseThrow(() -> new NotFoundException("githubTokenNotFound")).getToken();
+//        String githubAccessToken = githubTokenRepository.findByUsername(model.getSender().getLogin())
+//                .orElseThrow(() -> new NotFoundException("githubTokenNotFound")).getToken();
 
         List<CommitResponseFromApi> commits = new ArrayList<>();
         model.getCommits().forEach(c -> commits.add(gitApiClient.getCommit(c.getAuthor().getName(), model.getRepository().getName(), c.getId(), "123123")));

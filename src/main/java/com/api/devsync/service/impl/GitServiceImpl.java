@@ -77,7 +77,7 @@ public class GitServiceImpl implements GitService {
 
     private PrepareAnalyzeDto setCommitDetails(GithubWebhookModel model) {
         List<CommitResponseFromApi> commits = new ArrayList<>();
-        model.getCommit().forEach(c -> commits.add(gitApiClient.getCommit(c.getAuthor().getName(), model.getRepository().getName(), c.getId(), "123123")));
+        model.getCommits().forEach(c -> commits.add(gitApiClient.getCommit(c.getAuthor().getName(), model.getRepository().getName(), c.getId(), "123123")));
 
         return PrepareAnalyzeDto.builder().fullName(model.getRepository().getFull_name())
                 .repositoryName(model.getRepository().getName())

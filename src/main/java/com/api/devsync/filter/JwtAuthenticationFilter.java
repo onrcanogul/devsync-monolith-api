@@ -25,9 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
@@ -42,20 +40,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = jwtService.extractUsername(jwt);
         List<String> roles = jwtService.extractRoles(jwt);
         if (username != null && jwtService.isTokenValid(jwt, username)) {
-            List<SimpleGrantedAuthority> authorities = roles != null
-                    ? roles.stream().map(SimpleGrantedAuthority::new).toList()
-                    : List.of();
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(
-                            username, null, authorities);
-
+            List<SimpleGrantedAuthority> authorities = roles != null ? roles.stream().map(SimpleGrantedAuthority::new).toList() : List.of();
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
-
         filterChain.doFilter(request, response);
     }
 }

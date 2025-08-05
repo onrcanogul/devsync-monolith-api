@@ -74,14 +74,12 @@ public class AnalyzeServiceImpl implements AnalyzeService {
     private PullRequestAnalysis buildBaseAnalysis(PrepareAnalyzeDto dto) {
         PullRequestAnalysis analysis = new PullRequestAnalysis();
         analysis.setTotalAdditions(
-                dto.getCommits().stream()
-                        .flatMap(a -> a.getFiles().stream())
+                dto.getCommits().stream().flatMap(a -> a.getFiles().stream())
                         .mapToInt(FileChangeFromApi::getDeletions)
                         .sum()
         );
         analysis.setTotalDeletions(
-                dto.getCommits().stream()
-                        .flatMap(a -> a.getFiles().stream())
+                dto.getCommits().stream().flatMap(a -> a.getFiles().stream())
                         .mapToInt(FileChangeFromApi::getDeletions)
                         .sum()
         );

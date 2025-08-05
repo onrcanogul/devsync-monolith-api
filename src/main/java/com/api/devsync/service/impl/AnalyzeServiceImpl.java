@@ -108,15 +108,12 @@ public class AnalyzeServiceImpl implements AnalyzeService {
 
         List<CommitAnalysis> commitAnalyses = aiResult.getCommitAnalyses().stream()
                 .map(dto -> {
-
                     CommitAnalysis commitAnalysis = commitAnalysisRepository.findById(dto.getHash())
                             .orElseGet(() -> {
                                 CommitAnalysis newCa = new CommitAnalysis();
                                 newCa.setId(dto.getHash());
                                 return newCa;
                             });
-
-
                     commitAnalysis.setAuthor(dto.getAuthor());
                     commitAnalysis.setRiskScore(dto.getRiskScore());
                     commitAnalysis.setFunctionalComment(dto.getFunctionalComment());

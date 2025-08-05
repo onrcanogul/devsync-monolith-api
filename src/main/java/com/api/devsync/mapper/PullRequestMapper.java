@@ -32,7 +32,7 @@ public class PullRequestMapper {
 
         pr.setId(System.currentTimeMillis());
         pr.setBranch(extractBranch(dto));
-        pr.setPusher(dto.getModel().getPusherFromWebhook().getName());
+        pr.setPusher(dto.getModel().getPusher().getName());
 
         if (dto.getModel().getHead_commit() != null) {
             pr.setHeadCommitMessage(dto.getModel().getHead_commit().getMessage());
@@ -63,7 +63,7 @@ public class PullRequestMapper {
     }
 
     private static User mapUser(PullRequestWithAnalysisDto dto, UserRepository userRepo) {
-        var sender = dto.getModel().getSenderFromWebhook();
+        var sender = dto.getModel().getSender();
         if (sender == null) return null;
 
         return userRepo.findById(sender.getId())
@@ -84,7 +84,7 @@ public class PullRequestMapper {
     }
 
     private static Repository mapRepository(PullRequestWithAnalysisDto dto, RepoRepository repoRepo) {
-        var repoDto = dto.getModel().getRepositoryFromWebhook();
+        var repoDto = dto.getModel().getRepository();
         return repoRepo.findById(repoDto.getId())
                 .map(existing -> {
                     existing.setName(repoDto.getName());
@@ -94,8 +94,8 @@ public class PullRequestMapper {
                     existing.setLanguage(repoDto.getLanguage());
                     existing.setDescription(repoDto.getDescription());
                     existing.setDefaultBranch(repoDto.getDefault_branch());
-                    existing.setOwnerLogin(repoDto.getOwnerFromWebhook().getLogin());
-                    existing.setOwnerId(repoDto.getOwnerFromWebhook().getId());
+                    existing.setOwnerLogin(repoDto.getOwner().getLogin());
+                    existing.setOwnerId(repoDto.getOwner().getId());
                     return existing;
                 })
                 .orElseGet(() -> {
@@ -108,17 +108,17 @@ public class PullRequestMapper {
                     r.setLanguage(repoDto.getLanguage());
                     r.setDescription(repoDto.getDescription());
                     r.setDefaultBranch(repoDto.getDefault_branch());
-                    r.setOwnerLogin(repoDto.getOwnerFromWebhook().getLogin());
-                    r.setOwnerId(repoDto.getOwnerFromWebhook().getId());
+                    r.setOwnerLogin(repoDto.getOwner().getLogin());
+                    r.setOwnerId(repoDto.getOwner().getId());
                     return repoRepo.save(r);
                 });
     }
 
     private static List<Commit> mapCommits(PullRequestWithAnalysisDto dto, CommitRepository commitRepo) {
         List<Commit> commits = new ArrayList<>();
-        if (dto.getModel().getCommitFromWebhooks() == null) return commits;
+        if (dto.getModel().getCommit() == null) return commits;
 
-        for (var c : dto.getModel().getCommitFromWebhooks()) {
+        for (var c : dto.getModel().getCommit()) {
             Commit commit = commitRepo.findById(c.getId())
                     .map(existing -> {
                         existing.setMessage(c.getMessage());

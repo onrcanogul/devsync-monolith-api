@@ -9,14 +9,14 @@ public class GithubWebhookModel {
     private String ref;
     private String before;
     private String after;
-    private RepositoryFromWebhook repositoryFromWebhook;
-    private PusherFromWebhook pusherFromWebhook;
-    private SenderFromWebhook senderFromWebhook;
+    private RepositoryFromWebhook repository;
+    private PusherFromWebhook pusher;
+    private SenderFromWebhook sender;
     private boolean created;
     private boolean deleted;
     private boolean forced;
     private String base_ref;
     private String compare;
-    private List<CommitFromWebhook> commitFromWebhooks;
+    private List<CommitFromWebhook> commit;
     private HeadCommitFromWebhook head_commit;
 }

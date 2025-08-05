@@ -77,13 +77,13 @@ public class GitServiceImpl implements GitService {
 
     private PrepareAnalyzeDto setCommitDetails(GithubWebhookModel model) {
         List<CommitResponseFromApi> commits = new ArrayList<>();
-        model.getCommitFromWebhooks().forEach(c -> commits.add(gitApiClient.getCommit(c.getAuthorFromWebhook().getName(), model.getRepositoryFromWebhook().getName(), c.getId(), "123123")));
+        model.getCommit().forEach(c -> commits.add(gitApiClient.getCommit(c.getAuthor().getName(), model.getRepository().getName(), c.getId(), "123123")));
 
-        return PrepareAnalyzeDto.builder().fullName(model.getRepositoryFromWebhook().getFull_name())
-                .repositoryName(model.getRepositoryFromWebhook().getName())
-                .repositoryDescription(model.getRepositoryFromWebhook().getDescription())
+        return PrepareAnalyzeDto.builder().fullName(model.getRepository().getFull_name())
+                .repositoryName(model.getRepository().getName())
+                .repositoryDescription(model.getRepository().getDescription())
                 .branchName(model.getRef())
-                .repoId(model.getRepositoryFromWebhook().getId())
+                .repoId(model.getRepository().getId())
                 .commits(commits)
                 .build();
     }

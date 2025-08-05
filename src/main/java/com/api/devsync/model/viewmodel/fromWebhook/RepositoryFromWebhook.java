@@ -12,7 +12,7 @@ public class RepositoryFromWebhook implements Serializable {
     private String name;
     private String full_name;
     private boolean isPrivate;
-    private OwnerFromWebhook ownerFromWebhook;
+    private OwnerFromWebhook owner;
     private String html_url;
     private String description;
     private boolean fork;

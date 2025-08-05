@@ -4,8 +4,8 @@ services:
     image: postgres:latest
     container_name: devsync-postgres
     restart: unless-stopped
-    ports:
-      - "5432:5432"
+#    ports:
+#      - "5432:5432"
     environment:
       POSTGRES_DB: devsync-db
       POSTGRES_USER: postgres

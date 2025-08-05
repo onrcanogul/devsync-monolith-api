@@ -37,9 +37,7 @@ public class GithubAuthServiceImpl implements GithubAuthService {
 
     public String getAccessToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
-
         String url = "https://github.com/login/oauth/access_token";
-
         HttpHeaders headers = new HttpHeaders();
 
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));

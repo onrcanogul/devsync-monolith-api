@@ -1,4 +1,4 @@
-package com.api.devsync.model.fromApi.commit;
+package com.api.devsync.model.viewmodel.fromApi.commit;
 
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +11,8 @@ public class CommitResponseFromApi {
      private String sha;
      private CommitFromApi commit;
      private List<FileChangeFromApi> files;
-    // private String node_id;
-    // private List<ParentCommitFromApi> parents;
-    // private CommitStats stats;
+     // min ai billing :)
+     // private String node_id;
+     // private List<ParentCommitFromApi> parents;
+     // private CommitStats stats;
 }

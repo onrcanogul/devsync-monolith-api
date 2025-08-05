@@ -1,4 +1,4 @@
-package com.api.devsync.model.fromWebhook;
+package com.api.devsync.model.viewmodel.fromWebhook;
 
 
 import lombok.Data;
@@ -6,13 +6,13 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class Repository implements Serializable {
+public class RepositoryFromWebhook implements Serializable {
     private long id;
     private String node_id;
     private String name;
     private String full_name;
     private boolean isPrivate;
-    private Owner owner;
+    private OwnerFromWebhook ownerFromWebhook;
     private String html_url;
     private String description;
     private boolean fork;

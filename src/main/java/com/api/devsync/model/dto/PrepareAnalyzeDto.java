@@ -1,6 +1,6 @@
 package com.api.devsync.model.dto;
 
-import com.api.devsync.model.fromApi.commit.CommitResponseFromApi;
+import com.api.devsync.model.viewmodel.fromApi.commit.CommitResponseFromApi;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

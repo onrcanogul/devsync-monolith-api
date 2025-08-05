@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class PullRequestAnalyzerServiceServiceImpl implements PullRequestAnalyzerService {
+public class PullRequestAnalyzerServiceImpl implements PullRequestAnalyzerService {
 
     private final ObjectMapper objectMapper;
     private final AIService aiService;
 
-    public PullRequestAnalyzerServiceServiceImpl(ObjectMapper objectMapper, AIService aiService) {
+    public PullRequestAnalyzerServiceImpl(ObjectMapper objectMapper, AIService aiService) {
         this.objectMapper = objectMapper;
         this.aiService = aiService;
     }

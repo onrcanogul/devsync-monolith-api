@@ -1,6 +1,6 @@
 package com.api.devsync.controller;
 
-import com.api.devsync.model.fromApi.repository.RepositoryFromApi;
+import com.api.devsync.model.viewmodel.fromApi.repository.RepositoryFromApi;
 import com.api.devsync.service.GitService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

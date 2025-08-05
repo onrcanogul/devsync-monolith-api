@@ -1,8 +1,8 @@
 package com.api.devsync.client;
 
-import com.api.devsync.model.fromApi.commit.CommitResponseFromApi;
-import com.api.devsync.model.fromApi.repository.RepositoryFromApi;
-import com.api.devsync.model.fromWebhook.Repository;
+import com.api.devsync.model.viewmodel.fromApi.commit.CommitResponseFromApi;
+import com.api.devsync.model.viewmodel.fromApi.repository.RepositoryFromApi;
+import com.api.devsync.model.viewmodel.fromWebhook.RepositoryFromWebhook;
 import com.api.devsync.properties.GitHubProperties;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -62,7 +62,7 @@ public class GitApiClient {
                 .block();
     }
 
-    public Repository getRepositoryDetails(String accessToken, String owner, String repo) {
+    public RepositoryFromWebhook getRepositoryDetails(String accessToken, String owner, String repo) {
         String url = String.format("https://api.github.com/repos/%s/%s", owner, repo);
 
         WebClient webClient = WebClient.builder().build();
@@ -71,7 +71,7 @@ public class GitApiClient {
                 .uri(url)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
-                .bodyToMono(Repository.class)
+                .bodyToMono(RepositoryFromWebhook.class)
                 .block();
     }
 

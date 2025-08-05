@@ -21,12 +21,7 @@ public class JwtServiceImpl implements JwtService {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-
-        claims.put("roles", userDetails
-                .getAuthorities()
-                .stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
-
+        claims.put("roles", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
         return createToken(userDetails.getUsername(), claims);
     }
 
@@ -42,47 +37,33 @@ public class JwtServiceImpl implements JwtService {
     }
 
     public String extractUsername(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
     }
 
     public boolean isTokenValid(String token, String username) {
-        return extractUsername(token).equals(username) &&
-                !isTokenExpired(token);
+        return extractUsername(token).equals(username) && !isTokenExpired(token);
     }
 
     public List<String> extractRoles(String token) {
         Claims claims = extractAllClaims(token);
         Object roles = claims.get("roles");
-
-        if (roles instanceof List<?>) {
-            return ((List<?>) roles).stream()
-                    .map(Object::toString)
-                    .collect(Collectors.toList());
-        }
+        if (roles instanceof List<?>)
+            return ((List<?>) roles).stream().map(Object::toString).collect(Collectors.toList());
         return new ArrayList<>();
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }
 
     private boolean isTokenExpired(String token) {
-        Date expiration = Jwts.parser().setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token).getBody().getExpiration();
+        Date expiration = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getExpiration();
         return expiration.before(new Date());
     }
 
     private String createToken(String username, Map<String, Object> claims) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setClaims(claims)
-                .setIssuedAt(new Date())
-                .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+        return Jwts.builder().setSubject(username).setClaims(claims).setIssuedAt(new Date())
+                .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS))).signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
 }

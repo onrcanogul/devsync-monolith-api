@@ -1,9 +1,9 @@
-package com.api.devsync.model.fromWebhook;
+package com.api.devsync.model.viewmodel.fromWebhook;
 
 import lombok.Data;
 
 @Data
-public class Author {
+public class AuthorFromWebhook {
     private String name;
     private String email;
     private String username;

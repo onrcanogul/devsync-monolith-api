@@ -29,12 +29,8 @@ public class OpenAiServiceImpl implements AIService {
                 .temperature(0.7)
                 .maxTokens(3000)
                 .build();
-
         List<ChatCompletionChoice> choices = service.createChatCompletion(request).getChoices();
-        if (!choices.isEmpty()) {
-            return choices.get(0).getMessage().getContent();
-        }
-
+        if (!choices.isEmpty()) return choices.get(0).getMessage().getContent();
         return "[No response from OpenAI]";
     }
 }

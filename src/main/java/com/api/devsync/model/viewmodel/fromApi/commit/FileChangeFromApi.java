@@ -1,4 +1,4 @@
-package com.api.devsync.model.fromApi.commit;
+package com.api.devsync.model.viewmodel.fromApi.commit;
 
 import lombok.Data;
 

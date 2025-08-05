@@ -1,9 +1,9 @@
-package com.api.devsync.model.fromApi.commit;
+package com.api.devsync.model.viewmodel.fromApi.commit;
 
 import lombok.Data;
 
 @Data
-public class AuthorFromApi {
+public class CommitterFromApi {
     private String login;
     private long id;
     private String avatar_url;

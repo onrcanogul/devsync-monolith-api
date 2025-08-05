@@ -6,9 +6,9 @@ import com.api.devsync.exception.NotFoundException;
 import com.api.devsync.model.dto.PrepareAnalyzeDto;
 import com.api.devsync.model.dto.PullRequestAnalysisDto;
 import com.api.devsync.model.dto.PullRequestWithAnalysisDto;
-import com.api.devsync.model.fromApi.commit.CommitResponseFromApi;
-import com.api.devsync.model.fromApi.repository.RepositoryFromApi;
-import com.api.devsync.model.fromWebhook.GithubWebhookModel;
+import com.api.devsync.model.viewmodel.fromApi.commit.CommitResponseFromApi;
+import com.api.devsync.model.viewmodel.fromApi.repository.RepositoryFromApi;
+import com.api.devsync.model.viewmodel.fromWebhook.GithubWebhookModel;
 import com.api.devsync.repository.GithubTokenRepository;
 import com.api.devsync.service.AnalyzeService;
 import com.api.devsync.service.GitService;
@@ -76,17 +76,14 @@ public class GitServiceImpl implements GitService {
 
 
     private PrepareAnalyzeDto setCommitDetails(GithubWebhookModel model) {
-//        String githubAccessToken = githubTokenRepository.findByUsername(model.getSender().getLogin())
-//                .orElseThrow(() -> new NotFoundException("githubTokenNotFound")).getToken();
-
         List<CommitResponseFromApi> commits = new ArrayList<>();
-        model.getCommits().forEach(c -> commits.add(gitApiClient.getCommit(c.getAuthor().getName(), model.getRepository().getName(), c.getId(), "123123")));
+        model.getCommitFromWebhooks().forEach(c -> commits.add(gitApiClient.getCommit(c.getAuthorFromWebhook().getName(), model.getRepositoryFromWebhook().getName(), c.getId(), "123123")));
 
-        return PrepareAnalyzeDto.builder().fullName(model.getRepository().getFull_name())
-                .repositoryName(model.getRepository().getName())
-                .repositoryDescription(model.getRepository().getDescription())
+        return PrepareAnalyzeDto.builder().fullName(model.getRepositoryFromWebhook().getFull_name())
+                .repositoryName(model.getRepositoryFromWebhook().getName())
+                .repositoryDescription(model.getRepositoryFromWebhook().getDescription())
                 .branchName(model.getRef())
-                .repoId(model.getRepository().getId())
+                .repoId(model.getRepositoryFromWebhook().getId())
                 .commits(commits)
                 .build();
     }

@@ -1,23 +1,20 @@
 package com.api.devsync.service.impl;
 
 import com.api.devsync.entity.Analyze;
-import com.api.devsync.entity.CommitAnalysis;
 import com.api.devsync.entity.PullRequestAnalysis;
 import com.api.devsync.mapper.AnalyzeMapper;
 import com.api.devsync.mapper.PullRequestAnalyzeMapper;
 import com.api.devsync.model.dto.*;
-import com.api.devsync.model.fromApi.commit.FileChangeFromApi;
-import com.api.devsync.repository.CommitAnalysisRepository;
-import com.api.devsync.repository.CommitRepository;
+import com.api.devsync.model.viewmodel.fromApi.commit.FileChangeFromApi;
 import com.api.devsync.repository.PullRequestAnalysisRepository;
 import com.api.devsync.service.AnalyzeService;
+import com.api.devsync.service.CommitAnalyzerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,17 +23,15 @@ public class AnalyzeServiceImpl implements AnalyzeService {
     private final PullRequestAnalysisRepository repository;
     private final AnalyzeMapper analyzeMapper;
     private final PullRequestAnalyzeMapper pullRequestAnalyzeMapper;
-    private final CommitRepository commitRepository;
-    private final CommitAnalysisRepository commitAnalysisRepository;
-    private final PullRequestAnalyzerServiceServiceImpl pullRequestAnalyzerServiceServiceImpl;
+    private final PullRequestAnalyzerServiceImpl pullRequestAnalyzerServiceImpl;
+    private final CommitAnalyzerService commitAnalyzerService;
 
-    public AnalyzeServiceImpl(PullRequestAnalysisRepository repository, AnalyzeMapper analyzeMapper, PullRequestAnalyzeMapper pullRequestAnalyzeMapper, CommitRepository commitRepository, CommitAnalysisRepository commitAnalysisRepository, PullRequestAnalyzerServiceServiceImpl pullRequestAnalyzerServiceServiceImpl) {
+    public AnalyzeServiceImpl(PullRequestAnalysisRepository repository, AnalyzeMapper analyzeMapper, PullRequestAnalyzeMapper pullRequestAnalyzeMapper, PullRequestAnalyzerServiceImpl pullRequestAnalyzerServiceImpl, CommitAnalyzerService commitAnalyzerService) {
         this.repository = repository;
         this.analyzeMapper = analyzeMapper;
         this.pullRequestAnalyzeMapper = pullRequestAnalyzeMapper;
-        this.commitRepository = commitRepository;
-        this.commitAnalysisRepository = commitAnalysisRepository;
-        this.pullRequestAnalyzerServiceServiceImpl = pullRequestAnalyzerServiceServiceImpl;
+        this.pullRequestAnalyzerServiceImpl = pullRequestAnalyzerServiceImpl;
+        this.commitAnalyzerService = commitAnalyzerService;
     }
 
     public List<AnalyzeDto> get(int page, int size) {
@@ -60,29 +55,18 @@ public class AnalyzeServiceImpl implements AnalyzeService {
         return analyzeMapper.toDto(analyze);
     }
 
-
     public PullRequestAnalysisDto createAnalyze(PrepareAnalyzeDto model) throws JsonProcessingException {
         PullRequestAnalysis analyze = buildBaseAnalysis(model);
-        AnalyzeAIDto aiResult = pullRequestAnalyzerServiceServiceImpl.analyze(model);
-
+        AnalyzeAIDto aiResult = pullRequestAnalyzerServiceImpl.analyze(model);
         applyAiAnalysisToPullRequest(analyze, aiResult);
-        applyAiAnalysisToCommits(analyze, aiResult);
-
+        commitAnalyzerService.applyAiAnalysisToCommits(analyze, aiResult);
         return pullRequestAnalyzeMapper.toDto(analyze);
     }
 
     private PullRequestAnalysis buildBaseAnalysis(PrepareAnalyzeDto dto) {
         PullRequestAnalysis analysis = new PullRequestAnalysis();
-        analysis.setTotalAdditions(
-                dto.getCommits().stream().flatMap(a -> a.getFiles().stream())
-                        .mapToInt(FileChangeFromApi::getDeletions)
-                        .sum()
-        );
-        analysis.setTotalDeletions(
-                dto.getCommits().stream().flatMap(a -> a.getFiles().stream())
-                        .mapToInt(FileChangeFromApi::getDeletions)
-                        .sum()
-        );
+        analysis.setTotalAdditions(dto.getCommits().stream().flatMap(a -> a.getFiles().stream()).mapToInt(FileChangeFromApi::getDeletions).sum());
+        analysis.setTotalDeletions(dto.getCommits().stream().flatMap(a -> a.getFiles().stream()).mapToInt(FileChangeFromApi::getDeletions).sum());
         analysis.setBranch(dto.getBranchName());
         analysis.setRepoName(dto.getRepositoryName());
         analysis.setRepoId(dto.getRepoId());
@@ -97,37 +81,6 @@ public class AnalyzeServiceImpl implements AnalyzeService {
         analyze.setRiskScore(prAnalysis.getRiskScore());
     }
 
-    private void applyAiAnalysisToCommits(PullRequestAnalysis analyze, AnalyzeAIDto aiResult) {
-
-        if (aiResult.getCommitAnalyses() == null || aiResult.getCommitAnalyses().isEmpty()) {
-            analyze.setCommitAnalysis(Collections.emptyList());
-            return;
-        }
-
-        List<CommitAnalysis> commitAnalyses = aiResult.getCommitAnalyses().stream()
-                .map(dto -> {
-                    CommitAnalysis commitAnalysis = commitAnalysisRepository.findById(dto.getHash())
-                            .orElseGet(() -> {
-                                CommitAnalysis newCa = new CommitAnalysis();
-                                newCa.setId(dto.getHash());
-                                return newCa;
-                            });
-                    commitAnalysis.setAuthor(dto.getAuthor());
-                    commitAnalysis.setRiskScore(dto.getRiskScore());
-                    commitAnalysis.setFunctionalComment(dto.getFunctionalComment());
-                    commitAnalysis.setArchitecturalComment(dto.getArchitecturalComment());
-                    commitAnalysis.setTechnicalComment(dto.getTechnicalComment());
-
-
-                    commitRepository.findById(dto.getHash())
-                            .ifPresent(commitAnalysis::setCommit);
-
-                    return commitAnalysis;
-                })
-                .toList();
-
-        analyze.setCommitAnalysis(commitAnalyses);
-    }
 
 
 

@@ -1,13 +1,12 @@
-package com.api.devsync.model.fromApi.commit;
+package com.api.devsync.model.viewmodel.fromApi.commit;
 
 import lombok.Data;
 
 @Data
-public class CommitDetailFromApi {
+public class CommitFromApi {
     private CommitAuthorFromApi author;
     private CommitterFromApi committer;
     private String message;
     private String url;
     private int comment_count;
-    private CommitVerificationFromApi verification;
 }

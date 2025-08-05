@@ -3,9 +3,7 @@ package com.api.devsync.model.viewmodel.fromWebhook;
 import lombok.Data;
 
 @Data
-public class OwnerFromWebhook {
-    private String name;
-    private String email;
+public class Sender {
     private String login;
     private long id;
     private String node_id;

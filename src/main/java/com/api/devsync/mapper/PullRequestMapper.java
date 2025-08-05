@@ -116,9 +116,9 @@ public class PullRequestMapper {
 
     private static List<Commit> mapCommits(PullRequestWithAnalysisDto dto, CommitRepository commitRepo) {
         List<Commit> commits = new ArrayList<>();
-        if (dto.getModel().getCommit() == null) return commits;
+        if (dto.getModel().getCommits() == null) return commits;
 
-        for (var c : dto.getModel().getCommit()) {
+        for (var c : dto.getModel().getCommits()) {
             Commit commit = commitRepo.findById(c.getId())
                     .map(existing -> {
                         existing.setMessage(c.getMessage());

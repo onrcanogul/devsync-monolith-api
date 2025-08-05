@@ -83,13 +83,9 @@ public class PullRequestServiceImpl implements PullRequestService {
                             return existing;
                         })
                         .orElseGet(() -> new Commit(c.getId(), c.getMessage()));
-
-                commit.setPullRequest(pr);
                 commits.add(commit);
             }
         }
-        pr.setCommitCount(commits.size());
-        pr.setCommits(commits);
 
         // User (find-or-create)
         if (model.getModel().getSender() != null) {
@@ -167,10 +163,10 @@ public class PullRequestServiceImpl implements PullRequestService {
                             ca.setFunctionalComment(analysisDto.getFunctionalComment());
                             return ca;
                         });
-
                 commit.setAnalysis(analysis);
             }
         }
+        pr.setCommits(commits);
     }
 
 

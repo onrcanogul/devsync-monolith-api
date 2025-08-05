@@ -27,7 +27,7 @@ public class OpenAiServiceImpl implements AIService {
                 .model(llm)
                 .messages(List.of(userMessage))
                 .temperature(0.7)
-                .maxTokens(4000)
+                .maxTokens(3000)
                 .build();
 
         List<ChatCompletionChoice> choices = service.createChatCompletion(request).getChoices();

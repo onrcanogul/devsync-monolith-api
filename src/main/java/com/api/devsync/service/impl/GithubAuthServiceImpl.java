@@ -30,8 +30,6 @@ public class GithubAuthServiceImpl implements GithubAuthService {
     private GithubTokenRepository githubTokenRepository;
 
     public GithubAuthServiceImpl(GithubTokenRepository githubTokenRepository) {
-        log.info("client-id: " + clientId);
-        log.info("client-secret: " + clientSecret);
         this.githubTokenRepository = githubTokenRepository;
     }
 

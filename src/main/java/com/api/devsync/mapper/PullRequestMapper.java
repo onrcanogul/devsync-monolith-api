@@ -1,13 +1,8 @@
 package com.api.devsync.mapper;
 
 import com.api.devsync.entity.*;
-import com.api.devsync.exception.BadRequestException;
 import com.api.devsync.exception.NotFoundException;
-import com.api.devsync.model.dto.CommitAnalysisDto;
-import com.api.devsync.model.dto.PullRequestAnalysisDto;
 import com.api.devsync.model.dto.PullRequestWithAnalysisDto;
-import com.api.devsync.repository.CommitAnalysisRepository;
-import com.api.devsync.repository.CommitRepository;
 import com.api.devsync.repository.RepoRepository;
 import com.api.devsync.repository.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -16,16 +11,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PullRequestMapper {
 
     public static PullRequest mapToEntity(
             PullRequestWithAnalysisDto dto,
-            CommitRepository commitRepo,
-            CommitAnalysisRepository commitAnalysisRepo,
             RepoRepository repoRepo,
             EntityManager entityManager,
             UserRepository userRepo
@@ -38,7 +29,7 @@ public class PullRequestMapper {
 
         User user = mapUser(dto, userRepo);
         Repository repo = mapRepository(dto, repoRepo);
-        mapCommits(dto, pr, commitRepo, entityManager);
+        mapCommits(dto, pr, entityManager);
 
         pr.setCreatedBy(user);
         pr.setRepository(repo);
@@ -107,7 +98,7 @@ public class PullRequestMapper {
                 });
     }
 
-    private static void mapCommits(PullRequestWithAnalysisDto dto, PullRequest pullRequest, CommitRepository commitRepository, EntityManager entityManager) {
+    private static void mapCommits(PullRequestWithAnalysisDto dto, PullRequest pullRequest, EntityManager entityManager) {
         if (dto.getModel().getCommits() == null) return;
 
         for (var c : dto.getModel().getCommits()) {

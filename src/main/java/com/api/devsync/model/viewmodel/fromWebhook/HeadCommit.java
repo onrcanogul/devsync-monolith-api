@@ -12,8 +12,8 @@ public class HeadCommit {
     private String message;
     private String timestamp;
     private String url;
-    private Author author;
-    private Committer committer;
+    private AuthorFromWebhook author;
+    private CommitterFromWebhook committer;
     private List<String> added;
     private List<String> removed;
     private List<String> modified;

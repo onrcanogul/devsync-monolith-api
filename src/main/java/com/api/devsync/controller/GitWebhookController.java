@@ -23,9 +23,7 @@ public class GitWebhookController {
 
     @PostMapping("/webhook/pull-request")
     public ResponseEntity<Void> handleWebhook(@RequestBody Map<String, Object> payload) throws JsonProcessingException {
-        System.out.println(payload);
         GithubWebhookModel model = objectMapper.convertValue(payload, GithubWebhookModel.class);
-        System.out.println(model.toString());
         gitService.handlePullRequest(model);
         return ResponseEntity.ok().build();
     }

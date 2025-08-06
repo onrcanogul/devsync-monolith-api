@@ -2,7 +2,6 @@ package com.api.devsync.client;
 
 import com.api.devsync.model.viewmodel.fromApi.commit.CommitResponseFromApi;
 import com.api.devsync.model.viewmodel.fromApi.repository.RepositoryFromApi;
-import com.api.devsync.model.viewmodel.fromWebhook.Repository;
 import com.api.devsync.properties.GitHubProperties;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -55,23 +54,9 @@ public class GitApiClient {
     public CommitResponseFromApi getCommit(String owner, String repo, String sha, String token) {
         return webClient.get()
                 .uri("/repos/{owner}/{repo}/commits/{sha}", owner, repo, sha)
-//                .header("Authorization", "Bearer " + token)
                 .header("Accept", "application/vnd.github.v3+json")
                 .retrieve()
                 .bodyToMono(CommitResponseFromApi.class)
-                .block();
-    }
-
-    public Repository getRepositoryDetails(String accessToken, String owner, String repo) {
-        String url = String.format("https://api.github.com/repos/%s/%s", owner, repo);
-
-        WebClient webClient = WebClient.builder().build();
-
-        return webClient.get()
-                .uri(url)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .retrieve()
-                .bodyToMono(Repository.class)
                 .block();
     }
 

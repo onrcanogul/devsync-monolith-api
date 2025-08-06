@@ -3,7 +3,6 @@ package com.api.devsync.service.impl;
 import com.api.devsync.entity.Analyze;
 import com.api.devsync.entity.PullRequestAnalysis;
 import com.api.devsync.mapper.AnalyzeMapper;
-import com.api.devsync.mapper.PullRequestAnalyzeMapper;
 import com.api.devsync.model.dto.*;
 import com.api.devsync.model.viewmodel.fromApi.commit.FileChangeFromApi;
 import com.api.devsync.repository.PullRequestAnalysisRepository;
@@ -23,14 +22,12 @@ import java.util.UUID;
 public class AnalyzeServiceImpl implements AnalyzeService {
     private final PullRequestAnalysisRepository repository;
     private final AnalyzeMapper analyzeMapper;
-    private final PullRequestAnalyzeMapper pullRequestAnalyzeMapper;
     private final PullRequestAnalyzerService pullRequestAnalyzerService;
     private final CommitAnalyzerService commitAnalyzerService;
 
-    public AnalyzeServiceImpl(PullRequestAnalysisRepository repository, AnalyzeMapper analyzeMapper, PullRequestAnalyzeMapper pullRequestAnalyzeMapper, PullRequestAnalyzerService pullRequestAnalyzerService, CommitAnalyzerService commitAnalyzerService) {
+    public AnalyzeServiceImpl(PullRequestAnalysisRepository repository, AnalyzeMapper analyzeMapper, PullRequestAnalyzerService pullRequestAnalyzerService, CommitAnalyzerService commitAnalyzerService) {
         this.repository = repository;
         this.analyzeMapper = analyzeMapper;
-        this.pullRequestAnalyzeMapper = pullRequestAnalyzeMapper;
         this.pullRequestAnalyzerService = pullRequestAnalyzerService;
         this.commitAnalyzerService = commitAnalyzerService;
     }

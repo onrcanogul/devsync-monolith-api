@@ -1,6 +1,7 @@
 package com.api.devsync.service.impl;
 
 import com.api.devsync.entity.Commit;
+import com.api.devsync.exception.NotFoundException;
 import com.api.devsync.repository.CommitRepository;
 import com.api.devsync.service.CommitService;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class CommitServiceImpl implements CommitService {
 
     @Override
     public Commit getByHash(String hash) {
-        return commitRepository.findByHash(hash).get();
+        return commitRepository.findByHash(hash)
+                .orElseThrow(() -> new NotFoundException("commitNotFound"));
     }
 }

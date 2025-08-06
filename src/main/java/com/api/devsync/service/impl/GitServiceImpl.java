@@ -5,7 +5,6 @@ import com.api.devsync.constant.AppConstants;
 import com.api.devsync.entity.PullRequestAnalysis;
 import com.api.devsync.exception.NotFoundException;
 import com.api.devsync.model.dto.PrepareAnalyzeDto;
-import com.api.devsync.model.dto.PullRequestAnalysisDto;
 import com.api.devsync.model.dto.PullRequestWithAnalysisDto;
 import com.api.devsync.model.viewmodel.fromApi.commit.CommitResponseFromApi;
 import com.api.devsync.model.viewmodel.fromApi.repository.RepositoryFromApi;
@@ -78,7 +77,7 @@ public class GitServiceImpl implements GitService {
 
     private PrepareAnalyzeDto setCommitDetails(GithubWebhookModel model) {
         List<CommitResponseFromApi> commits = new ArrayList<>();
-        model.getCommits().forEach(c -> commits.add(gitApiClient.getCommit(c.getAuthor().getName(), model.getRepository().getName(), c.getId(), "123123")));
+        model.getCommits().forEach(c -> commits.add(gitApiClient.getCommit(c.getAuthor().getName(), model.getRepository().getName(), c.getId(), "no_matter")));
 
         return PrepareAnalyzeDto.builder().fullName(model.getRepository().getFull_name())
                 .repositoryName(model.getRepository().getName())

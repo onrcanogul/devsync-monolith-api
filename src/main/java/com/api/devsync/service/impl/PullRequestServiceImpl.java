@@ -53,15 +53,11 @@ public class PullRequestServiceImpl implements PullRequestService {
     @Override
     @Transactional
     public void save(PullRequestWithAnalysisDto model) {
-
         PullRequest pr = PullRequestMapper.mapToEntity(
                 model,
-                commitRepository,
-                commitAnalysisRepository,
                 repositoryRepository,
                 entityManager,
                 userRepository);
-        System.out.println("saving pr:" + pr.toString());
         pullRequestRepository.save(pr);
     }
 }

@@ -6,13 +6,13 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class Repository implements Serializable {
+public class RepositoryFromWebhook implements Serializable {
     private long id;
     private String node_id;
     private String name;
     private String full_name;
     private boolean isPrivate;
-    private Owner owner;
+    private OwnerFromWebhook owner;
     private String html_url;
     private String description;
     private boolean fork;

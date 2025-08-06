@@ -120,6 +120,7 @@ public class PullRequestMapper {
                     .stream().filter(ca -> Objects.equals(ca.getId(), c.getId()))
                     .findFirst()
                     .orElseThrow(() -> new NotFoundException("commitHashNotFound"));
+            commitAnalysis.setCommit(newCommit);
             newCommit.setAnalysis(commitAnalysis);
             newCommit.setPullRequest(pullRequest);
             commits.add(newCommit);

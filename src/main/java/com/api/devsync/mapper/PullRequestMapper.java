@@ -29,6 +29,7 @@ public class PullRequestMapper {
             UserRepository userRepo
     ) {
         PullRequest pr = new PullRequest();
+        pr.setCommits(new ArrayList<>());
         pr.setId(System.currentTimeMillis());
         pr.setBranch(extractBranch(dto));
         pr.setPusher(dto.getModel().getPusher().getName());

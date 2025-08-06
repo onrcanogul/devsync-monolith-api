@@ -1,5 +1,6 @@
 package com.api.devsync.service;
 
+import com.api.devsync.entity.PullRequestAnalysis;
 import com.api.devsync.model.dto.AnalyzeDto;
 import com.api.devsync.model.dto.PrepareAnalyzeDto;
 import com.api.devsync.model.dto.PullRequestAnalysisDto;
@@ -13,5 +14,5 @@ public interface AnalyzeService {
     List<AnalyzeDto> getByRepository(Long repoId);
     AnalyzeDto getById(UUID id);
     AnalyzeDto getByPullRequest(Long pullRequestId);
-    PullRequestAnalysisDto createAnalyze(PrepareAnalyzeDto model) throws JsonProcessingException;
+    PullRequestAnalysis createAnalyze(PrepareAnalyzeDto model) throws JsonProcessingException;
 }

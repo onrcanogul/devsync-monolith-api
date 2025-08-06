@@ -9,6 +9,7 @@ import com.api.devsync.model.viewmodel.fromApi.commit.FileChangeFromApi;
 import com.api.devsync.repository.PullRequestAnalysisRepository;
 import com.api.devsync.service.AnalyzeService;
 import com.api.devsync.service.CommitAnalyzerService;
+import com.api.devsync.service.PullRequestAnalyzerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,14 +24,14 @@ public class AnalyzeServiceImpl implements AnalyzeService {
     private final PullRequestAnalysisRepository repository;
     private final AnalyzeMapper analyzeMapper;
     private final PullRequestAnalyzeMapper pullRequestAnalyzeMapper;
-    private final PullRequestAnalyzerServiceImpl pullRequestAnalyzerServiceImpl;
+    private final PullRequestAnalyzerService pullRequestAnalyzerService;
     private final CommitAnalyzerService commitAnalyzerService;
 
-    public AnalyzeServiceImpl(PullRequestAnalysisRepository repository, AnalyzeMapper analyzeMapper, PullRequestAnalyzeMapper pullRequestAnalyzeMapper, PullRequestAnalyzerServiceImpl pullRequestAnalyzerServiceImpl, CommitAnalyzerService commitAnalyzerService) {
+    public AnalyzeServiceImpl(PullRequestAnalysisRepository repository, AnalyzeMapper analyzeMapper, PullRequestAnalyzeMapper pullRequestAnalyzeMapper, PullRequestAnalyzerService pullRequestAnalyzerService, CommitAnalyzerService commitAnalyzerService) {
         this.repository = repository;
         this.analyzeMapper = analyzeMapper;
         this.pullRequestAnalyzeMapper = pullRequestAnalyzeMapper;
-        this.pullRequestAnalyzerServiceImpl = pullRequestAnalyzerServiceImpl;
+        this.pullRequestAnalyzerService = pullRequestAnalyzerService;
         this.commitAnalyzerService = commitAnalyzerService;
     }
 
@@ -60,12 +61,12 @@ public class AnalyzeServiceImpl implements AnalyzeService {
     }
 
     @Override
-    public PullRequestAnalysisDto createAnalyze(PrepareAnalyzeDto model) throws JsonProcessingException {
+    public PullRequestAnalysis createAnalyze(PrepareAnalyzeDto model) throws JsonProcessingException {
         PullRequestAnalysis analyze = buildBaseAnalysis(model);
-        AnalyzeAIDto aiResult = pullRequestAnalyzerServiceImpl.analyze(model);
-        applyAiAnalysisToPullRequest(analyze, aiResult);
+        AnalyzeAIDto aiResult = pullRequestAnalyzerService.analyze(model);
+        pullRequestAnalyzerService.applyAiAnalysisToPullRequest(analyze, aiResult);
         commitAnalyzerService.applyAiAnalysisToCommits(analyze, aiResult);
-        return pullRequestAnalyzeMapper.toDto(analyze);
+        return analyze;
     }
 
     private PullRequestAnalysis buildBaseAnalysis(PrepareAnalyzeDto dto) {
@@ -77,19 +78,4 @@ public class AnalyzeServiceImpl implements AnalyzeService {
         analysis.setRepoId(dto.getRepoId());
         return analysis;
     }
-
-    private void applyAiAnalysisToPullRequest(PullRequestAnalysis analyze, AnalyzeAIDto aiResult) {
-        var prAnalysis = aiResult.getPullRequestAnalysis();
-        analyze.setTechnicalComment(prAnalysis.getTechnicalComment());
-        analyze.setFunctionalComment(prAnalysis.getFunctionalComment());
-        analyze.setArchitecturalComment(prAnalysis.getArchitecturalComment());
-        analyze.setRiskScore(prAnalysis.getRiskScore());
-        analyze.setRiskReason(prAnalysis.getRiskReason());
-    }
-
-
-
-
-
-
 }

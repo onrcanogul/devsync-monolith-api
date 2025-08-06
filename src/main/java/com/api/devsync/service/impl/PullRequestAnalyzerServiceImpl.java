@@ -1,6 +1,7 @@
 package com.api.devsync.service.impl;
 
 import com.api.devsync.constant.Prompts;
+import com.api.devsync.entity.PullRequestAnalysis;
 import com.api.devsync.model.dto.*;
 import com.api.devsync.service.AIService;
 import com.api.devsync.service.PullRequestAnalyzerService;
@@ -20,6 +21,16 @@ public class PullRequestAnalyzerServiceImpl implements PullRequestAnalyzerServic
     public PullRequestAnalyzerServiceImpl(ObjectMapper objectMapper, AIService aiService) {
         this.objectMapper = objectMapper;
         this.aiService = aiService;
+    }
+
+    @Override
+    public void applyAiAnalysisToPullRequest(PullRequestAnalysis analyze, AnalyzeAIDto aiResult) {
+        var prAnalysis = aiResult.getPullRequestAnalysis();
+        analyze.setTechnicalComment(prAnalysis.getTechnicalComment());
+        analyze.setFunctionalComment(prAnalysis.getFunctionalComment());
+        analyze.setArchitecturalComment(prAnalysis.getArchitecturalComment());
+        analyze.setRiskScore(prAnalysis.getRiskScore());
+        analyze.setRiskReason(prAnalysis.getRiskReason());
     }
 
     @Override

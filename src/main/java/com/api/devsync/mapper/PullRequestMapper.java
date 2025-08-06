@@ -1,6 +1,7 @@
 package com.api.devsync.mapper;
 
 import com.api.devsync.entity.*;
+import com.api.devsync.exception.NotFoundException;
 import com.api.devsync.model.dto.CommitAnalysisDto;
 import com.api.devsync.model.dto.PullRequestAnalysisDto;
 import com.api.devsync.model.dto.PullRequestWithAnalysisDto;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,31 +31,22 @@ public class PullRequestMapper {
             UserRepository userRepo
     ) {
         PullRequest pr = new PullRequest();
-
         pr.setId(System.currentTimeMillis());
         pr.setBranch(extractBranch(dto));
         pr.setPusher(dto.getModel().getPusher().getName());
 
-        if (dto.getModel().getHead_commit() != null) {
-            pr.setHeadCommitMessage(dto.getModel().getHead_commit().getMessage());
-            pr.setHeadCommitSha(dto.getModel().getHead_commit().getId());
-        }
-
         User user = mapUser(dto, userRepo);
-        if (user != null) pr.setCreatedBy(user);
-
         Repository repo = mapRepository(dto, repoRepo);
+        List<Commit> commits = mapCommits(dto, commitRepo);
+
+        pr.setCreatedBy(user);
+        pr.setCommits(commits);
         pr.setRepository(repo);
 
-        List<Commit> commits = mapCommits(dto, commitRepo);
-        pr.setCommits(commits);
-
-        if (dto.getAnalyze() != null) {
-            mapAnalysis(pr, commits, dto.getAnalyze(), commitAnalysisRepo);
-        }
-
+        pr.setAnalysis(dto.getAnalyze());
         pr.setAnalyzedDate(LocalDateTime.now());
-
+        pr.setHeadCommitMessage(dto.getModel().getHead_commit().getMessage());
+        pr.setHeadCommitSha(dto.getModel().getHead_commit().getId());
         return pr;
     }
 
@@ -124,50 +117,19 @@ public class PullRequestMapper {
                         existing.setMessage(c.getMessage());
                         return existing;
                     })
-                    .orElseGet(() -> new Commit(c.getId(), c.getMessage()));
+                    .orElseGet(() -> {
+                        Commit newCommit = new Commit(c.getId(), c.getMessage());
+                        CommitAnalysis commitAnalysis = dto.getAnalyze()
+                                .getCommitAnalysis()
+                                .stream().filter(ca -> Objects.equals(ca.getId(), c.getId()))
+                                .findFirst()
+                                .orElseThrow(() -> new NotFoundException("commitHashNotFound"));
+                        newCommit.setAnalysis(commitAnalysis);
+                        return newCommit;
+                    });
             commits.add(commit);
         }
         return commits;
-    }
-
-    private static void mapAnalysis(PullRequest pr, List<Commit> commits, PullRequestAnalysisDto analysisDto, CommitAnalysisRepository commitAnalysisRepo) {
-        PullRequestAnalysis prAnalysis = new PullRequestAnalysis();
-        prAnalysis.setFunctionalComment(analysisDto.getFunctionalComment());
-        prAnalysis.setRiskScore(analysisDto.getRiskScore());
-        prAnalysis.setArchitecturalComment(analysisDto.getArchitecturalComment());
-        prAnalysis.setTechnicalComment(analysisDto.getTechnicalComment());
-        pr.setAnalysis(prAnalysis);
-
-        Map<String, CommitAnalysisDto> commitAnalysisMap = analysisDto.getCommitAnalysis()
-                .stream()
-                .collect(Collectors.toMap(CommitAnalysisDto::getId, Function.identity()));
-
-        for (Commit commit : commits) {
-            CommitAnalysisDto dto = commitAnalysisMap.get(commit.getHash());
-            if (dto == null) continue;
-
-            CommitAnalysis analysis = commitAnalysisRepo.findById(dto.getId())
-                    .map(existing -> {
-                        existing.setRiskScore(dto.getRiskScore());
-                        existing.setTechnicalComment(dto.getTechnicalComment());
-                        existing.setArchitecturalComment(dto.getArchitecturalComment());
-                        existing.setFunctionalComment(dto.getFunctionalComment());
-                        existing.setCommit(commit);
-                        return existing;
-                    })
-                    .orElseGet(() -> {
-                        CommitAnalysis ca = new CommitAnalysis();
-                        ca.setId(dto.getId());
-                        ca.setCommit(commit);
-                        ca.setRiskScore(dto.getRiskScore());
-                        ca.setTechnicalComment(dto.getTechnicalComment());
-                        ca.setArchitecturalComment(dto.getArchitecturalComment());
-                        ca.setFunctionalComment(dto.getFunctionalComment());
-                        return ca;
-                    });
-
-            commit.setAnalysis(analysis);
-        }
     }
 }
 

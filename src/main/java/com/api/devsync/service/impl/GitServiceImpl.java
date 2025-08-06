@@ -2,6 +2,7 @@ package com.api.devsync.service.impl;
 
 import com.api.devsync.client.GitApiClient;
 import com.api.devsync.constant.AppConstants;
+import com.api.devsync.entity.PullRequestAnalysis;
 import com.api.devsync.exception.NotFoundException;
 import com.api.devsync.model.dto.PrepareAnalyzeDto;
 import com.api.devsync.model.dto.PullRequestAnalysisDto;
@@ -40,7 +41,7 @@ public class GitServiceImpl implements GitService {
     @Override
     public void handlePullRequest(GithubWebhookModel model) throws JsonProcessingException {
         PrepareAnalyzeDto prepareAnalyzeDto = setCommitDetails(model);
-        PullRequestAnalysisDto analyze = analyzeService.createAnalyze(prepareAnalyzeDto);
+        PullRequestAnalysis analyze = analyzeService.createAnalyze(prepareAnalyzeDto);
         PullRequestWithAnalysisDto pullRequestWithAnalysisDto = new PullRequestWithAnalysisDto(model, analyze);
         pullRequestService.save(pullRequestWithAnalysisDto);
     }

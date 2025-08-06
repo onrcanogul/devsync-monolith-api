@@ -1,5 +1,6 @@
 package com.api.devsync.model.dto;
 
+import com.api.devsync.entity.PullRequestAnalysis;
 import com.api.devsync.model.viewmodel.fromWebhook.GithubWebhookModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,5 +13,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PullRequestWithAnalysisDto {
     private GithubWebhookModel model;
-    private PullRequestAnalysisDto analyze;
+    private PullRequestAnalysis analyze;
 }

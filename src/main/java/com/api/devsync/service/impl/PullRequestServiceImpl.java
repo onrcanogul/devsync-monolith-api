@@ -57,6 +57,7 @@ public class PullRequestServiceImpl implements PullRequestService {
                 commitAnalysisRepository,
                 repositoryRepository,
                 userRepository);
+        System.out.println("saving pr:" + pr);
         pullRequestRepository.save(pr);
     }
 }

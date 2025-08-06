@@ -35,10 +35,9 @@ public class PullRequestMapper {
 
         User user = mapUser(dto, userRepo);
         Repository repo = mapRepository(dto, repoRepo);
-        List<Commit> commits = mapCommits(dto, commitRepo, pr);
+        mapCommits(dto, pr);
 
         pr.setCreatedBy(user);
-        pr.setCommits(commits);
         pr.setRepository(repo);
 
         pr.setAnalysis(dto.getAnalyze());
@@ -105,27 +104,26 @@ public class PullRequestMapper {
                 });
     }
 
-    private static List<Commit> mapCommits(PullRequestWithAnalysisDto dto, CommitRepository commitRepo, PullRequest pullRequest) {
-        List<Commit> commits = new ArrayList<>();
-        if (dto.getModel().getCommits() == null) return commits;
+    private static void mapCommits(PullRequestWithAnalysisDto dto, PullRequest pullRequest) {
+        if (dto.getModel().getCommits() == null) return;
 
         for (var c : dto.getModel().getCommits()) {
-            Optional<Commit> commit = commitRepo.findById(c.getId());
-            if (commit.isPresent()) {
-                throw new BadRequestException("commitHashAlreadyExist");
-            }
             Commit newCommit = new Commit(c.getId(), c.getMessage());
+
             CommitAnalysis commitAnalysis = dto.getAnalyze()
                     .getCommitAnalysis()
-                    .stream().filter(ca -> Objects.equals(ca.getId(), c.getId()))
+                    .stream()
+                    .filter(ca -> Objects.equals(ca.getId(), c.getId()))
                     .findFirst()
                     .orElseThrow(() -> new NotFoundException("commitHashNotFound"));
+
             commitAnalysis.setCommit(newCommit);
             newCommit.setAnalysis(commitAnalysis);
             newCommit.setPullRequest(pullRequest);
-            commits.add(newCommit);
+
+            pullRequest.getCommits().add(newCommit);
         }
-        return commits;
     }
+
 }
 

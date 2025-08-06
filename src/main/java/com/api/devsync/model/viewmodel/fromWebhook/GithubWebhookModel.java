@@ -18,5 +18,5 @@ public class GithubWebhookModel {
     private String base_ref;
     private String compare;
     private List<CommitFromWebhook> commits;
-    private HeadCommit head_commit;
+    private HeadCommitFromWebhook head_commit;
 }

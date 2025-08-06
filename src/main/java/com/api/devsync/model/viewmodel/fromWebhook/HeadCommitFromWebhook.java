@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class HeadCommit {
+public class HeadCommitFromWebhook {
     private String id;
     private String tree_id;
     private boolean distinct;

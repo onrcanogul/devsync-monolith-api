@@ -10,6 +10,7 @@ import com.api.devsync.repository.CommitAnalysisRepository;
 import com.api.devsync.repository.CommitRepository;
 import com.api.devsync.repository.RepoRepository;
 import com.api.devsync.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -26,6 +27,7 @@ public class PullRequestMapper {
             CommitRepository commitRepo,
             CommitAnalysisRepository commitAnalysisRepo,
             RepoRepository repoRepo,
+            EntityManager entityManager,
             UserRepository userRepo
     ) {
         PullRequest pr = new PullRequest();
@@ -36,7 +38,7 @@ public class PullRequestMapper {
 
         User user = mapUser(dto, userRepo);
         Repository repo = mapRepository(dto, repoRepo);
-        mapCommits(dto, pr, commitRepo);
+        mapCommits(dto, pr, commitRepo, entityManager);
 
         pr.setCreatedBy(user);
         pr.setRepository(repo);
@@ -105,7 +107,7 @@ public class PullRequestMapper {
                 });
     }
 
-    private static void mapCommits(PullRequestWithAnalysisDto dto, PullRequest pullRequest, CommitRepository commitRepository) {
+    private static void mapCommits(PullRequestWithAnalysisDto dto, PullRequest pullRequest, CommitRepository commitRepository, EntityManager entityManager) {
         if (dto.getModel().getCommits() == null) return;
 
         for (var c : dto.getModel().getCommits()) {
@@ -118,7 +120,7 @@ public class PullRequestMapper {
                     .filter(ca -> Objects.equals(ca.getId(), c.getId()))
                     .findFirst()
                     .orElseThrow(() -> new NotFoundException("commitHashNotFound"));
-            commitRepository.save(newCommit);
+            entityManager.persist(newCommit);
             commitAnalysis.setCommit(newCommit);
             newCommit.setAnalysis(commitAnalysis);
         }

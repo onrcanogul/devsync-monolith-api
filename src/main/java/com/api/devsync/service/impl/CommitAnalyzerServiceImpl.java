@@ -30,18 +30,14 @@ public class CommitAnalyzerServiceImpl implements CommitAnalyzerService {
         }
 
         List<CommitAnalysis> commitAnalyses = aiResult.getCommitAnalyses().stream().map(dto -> {
-            CommitAnalysis commitAnalysis = commitAnalysisRepository.findById(dto.getHash()).orElseGet(() -> {
-                CommitAnalysis newCa = new CommitAnalysis();
-                newCa.setId(dto.getHash());
-                return newCa;
-            });
+            CommitAnalysis commitAnalysis = new CommitAnalysis();
+            commitAnalysis.setId(dto.getHash());
             commitAnalysis.setAuthor(dto.getAuthor());
             commitAnalysis.setRiskScore(dto.getRiskScore());
             commitAnalysis.setRiskReason(dto.getRiskReason());
             commitAnalysis.setFunctionalComment(dto.getFunctionalComment());
             commitAnalysis.setArchitecturalComment(dto.getArchitecturalComment());
             commitAnalysis.setTechnicalComment(dto.getTechnicalComment());
-            commitRepository.findById(dto.getHash()).ifPresent(commitAnalysis::setCommit);
             return commitAnalysis;
         }).toList();
         analyze.setCommitAnalysis(commitAnalyses);

@@ -25,7 +25,7 @@ public class PullRequest {
     private String headCommitSha;
     private int commitCount;
 
-    @OneToMany(mappedBy = "pullRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "pullRequest", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Commit> commits;
 

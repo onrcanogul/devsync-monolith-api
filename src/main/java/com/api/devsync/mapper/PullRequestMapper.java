@@ -1,6 +1,7 @@
 package com.api.devsync.mapper;
 
 import com.api.devsync.entity.*;
+import com.api.devsync.exception.BadRequestException;
 import com.api.devsync.exception.NotFoundException;
 import com.api.devsync.model.dto.CommitAnalysisDto;
 import com.api.devsync.model.dto.PullRequestAnalysisDto;
@@ -13,10 +14,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -37,7 +35,7 @@ public class PullRequestMapper {
 
         User user = mapUser(dto, userRepo);
         Repository repo = mapRepository(dto, repoRepo);
-        List<Commit> commits = mapCommits(dto, commitRepo);
+        List<Commit> commits = mapCommits(dto, commitRepo, pr);
 
         pr.setCreatedBy(user);
         pr.setCommits(commits);
@@ -107,27 +105,24 @@ public class PullRequestMapper {
                 });
     }
 
-    private static List<Commit> mapCommits(PullRequestWithAnalysisDto dto, CommitRepository commitRepo) {
+    private static List<Commit> mapCommits(PullRequestWithAnalysisDto dto, CommitRepository commitRepo, PullRequest pullRequest) {
         List<Commit> commits = new ArrayList<>();
         if (dto.getModel().getCommits() == null) return commits;
 
         for (var c : dto.getModel().getCommits()) {
-            Commit commit = commitRepo.findById(c.getId())
-                    .map(existing -> {
-                        existing.setMessage(c.getMessage());
-                        return existing;
-                    })
-                    .orElseGet(() -> {
-                        Commit newCommit = new Commit(c.getId(), c.getMessage());
-                        CommitAnalysis commitAnalysis = dto.getAnalyze()
-                                .getCommitAnalysis()
-                                .stream().filter(ca -> Objects.equals(ca.getId(), c.getId()))
-                                .findFirst()
-                                .orElseThrow(() -> new NotFoundException("commitHashNotFound"));
-                        newCommit.setAnalysis(commitAnalysis);
-                        return newCommit;
-                    });
-            commits.add(commit);
+            Optional<Commit> commit = commitRepo.findById(c.getId());
+            if (commit.isPresent()) {
+                throw new BadRequestException("commitHashAlreadyExist");
+            }
+            Commit newCommit = new Commit(c.getId(), c.getMessage());
+            CommitAnalysis commitAnalysis = dto.getAnalyze()
+                    .getCommitAnalysis()
+                    .stream().filter(ca -> Objects.equals(ca.getId(), c.getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new NotFoundException("commitHashNotFound"));
+            newCommit.setAnalysis(commitAnalysis);
+            newCommit.setPullRequest(pullRequest);
+            commits.add(newCommit);
         }
         return commits;
     }

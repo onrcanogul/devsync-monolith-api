@@ -110,19 +110,16 @@ public class PullRequestMapper {
 
         for (var c : dto.getModel().getCommits()) {
             Commit newCommit = new Commit(c.getId(), c.getMessage());
-
+            newCommit.setPullRequest(pullRequest);
+            pullRequest.getCommits().add(newCommit);
             CommitAnalysis commitAnalysis = dto.getAnalyze()
                     .getCommitAnalysis()
                     .stream()
                     .filter(ca -> Objects.equals(ca.getId(), c.getId()))
                     .findFirst()
                     .orElseThrow(() -> new NotFoundException("commitHashNotFound"));
-
             commitAnalysis.setCommit(newCommit);
             newCommit.setAnalysis(commitAnalysis);
-            newCommit.setPullRequest(pullRequest);
-
-            pullRequest.getCommits().add(newCommit);
         }
     }
 

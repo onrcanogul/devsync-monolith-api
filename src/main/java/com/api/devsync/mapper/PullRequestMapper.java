@@ -36,7 +36,7 @@ public class PullRequestMapper {
 
         User user = mapUser(dto, userRepo);
         Repository repo = mapRepository(dto, repoRepo);
-        mapCommits(dto, pr);
+        mapCommits(dto, pr, commitRepo);
 
         pr.setCreatedBy(user);
         pr.setRepository(repo);
@@ -105,7 +105,7 @@ public class PullRequestMapper {
                 });
     }
 
-    private static void mapCommits(PullRequestWithAnalysisDto dto, PullRequest pullRequest) {
+    private static void mapCommits(PullRequestWithAnalysisDto dto, PullRequest pullRequest, CommitRepository commitRepository) {
         if (dto.getModel().getCommits() == null) return;
 
         for (var c : dto.getModel().getCommits()) {
@@ -118,6 +118,7 @@ public class PullRequestMapper {
                     .filter(ca -> Objects.equals(ca.getId(), c.getId()))
                     .findFirst()
                     .orElseThrow(() -> new NotFoundException("commitHashNotFound"));
+            commitRepository.save(newCommit);
             commitAnalysis.setCommit(newCommit);
             newCommit.setAnalysis(commitAnalysis);
         }

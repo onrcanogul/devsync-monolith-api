@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class PullRequestAIAnalyzeDto {
     private int riskScore;
+    private String riskReason;
     private String technicalComment;
     private String functionalComment;
     private String architecturalComment;

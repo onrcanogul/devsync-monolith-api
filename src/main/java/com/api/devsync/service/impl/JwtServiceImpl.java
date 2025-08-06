@@ -25,6 +25,7 @@ public class JwtServiceImpl implements JwtService {
         return createToken(userDetails.getUsername(), claims);
     }
 
+    @Override
     public String generateToken(String username, String githubId, String email) {
         return Jwts.builder()
                 .setSubject(username)
@@ -36,14 +37,17 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
+    @Override
     public String extractUsername(String token) {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
     }
 
+    @Override
     public boolean isTokenValid(String token, String username) {
         return extractUsername(token).equals(username) && !isTokenExpired(token);
     }
 
+    @Override
     public List<String> extractRoles(String token) {
         Claims claims = extractAllClaims(token);
         Object roles = claims.get("roles");

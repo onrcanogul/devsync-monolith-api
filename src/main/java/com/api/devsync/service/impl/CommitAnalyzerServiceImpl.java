@@ -21,6 +21,7 @@ public class CommitAnalyzerServiceImpl implements CommitAnalyzerService {
         this.commitAnalysisRepository = commitAnalysisRepository;
     }
 
+    @Override
     public void applyAiAnalysisToCommits(PullRequestAnalysis analyze, AnalyzeAIDto aiResult) {
 
         if (aiResult.getCommitAnalyses() == null || aiResult.getCommitAnalyses().isEmpty()) {
@@ -36,6 +37,7 @@ public class CommitAnalyzerServiceImpl implements CommitAnalyzerService {
             });
             commitAnalysis.setAuthor(dto.getAuthor());
             commitAnalysis.setRiskScore(dto.getRiskScore());
+            commitAnalysis.setRiskReason(dto.getRiskReason());
             commitAnalysis.setFunctionalComment(dto.getFunctionalComment());
             commitAnalysis.setArchitecturalComment(dto.getArchitecturalComment());
             commitAnalysis.setTechnicalComment(dto.getTechnicalComment());

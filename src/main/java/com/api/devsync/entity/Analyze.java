@@ -20,6 +20,7 @@ public class Analyze {
     private int totalAdditions;
     private int totalDeletions;
     private int riskScore;
+    private String riskReason;
     @Column(columnDefinition = "text")
     private String technicalComment;
     @Column(columnDefinition = "text")

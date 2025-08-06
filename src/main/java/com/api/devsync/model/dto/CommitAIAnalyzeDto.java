@@ -13,4 +13,5 @@ public class CommitAIAnalyzeDto {
     private String functionalComment;
     private String architecturalComment;
     private int riskScore;
+    private String riskReason;
 }

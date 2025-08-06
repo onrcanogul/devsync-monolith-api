@@ -22,12 +22,12 @@ public class PullRequestAnalyzerServiceImpl implements PullRequestAnalyzerServic
         this.aiService = aiService;
     }
 
+    @Override
     public AnalyzeAIDto analyze(PrepareAnalyzeDto model) throws JsonProcessingException {
         String prompt = Prompts.prAnalyzePrompt(objectMapper.writeValueAsString(model));
         String answer = aiService.send("gpt-4o-mini", prompt);
         return objectMapper.readValue(cleanJson(answer), AnalyzeAIDto.class);
     }
-
 
     private String cleanJson(String rawJson) {
         return rawJson

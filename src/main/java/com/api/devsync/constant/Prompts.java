@@ -17,6 +17,7 @@ OUTPUT FORMAT:
 {
   "pullRequestAnalysis": {
     "riskScore": <integer 0-100>,
+    "riskReason:" : "<detailed risk reason>",
     "technicalComment": "<detailed technical comment>",
     "functionalComment": "<detailed functional comment>",
     "architecturalComment": "<detailed architectural comment>"
@@ -29,7 +30,8 @@ OUTPUT FORMAT:
       "technicalComment": "<detailed technical comment>",
       "functionalComment": "<detailed functional comment>",
       "architecturalComment": "<detailed architectural comment>",
-      "riskScore": <integer 0-100>
+      "riskScore": <integer 0-100>,
+      "riskReason:" : "<detailed risk reason>",
     }
   ]
 }

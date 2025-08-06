@@ -35,6 +35,7 @@ public class GithubAuthServiceImpl implements GithubAuthService {
         this.githubTokenRepository = githubTokenRepository;
     }
 
+    @Override
     public String getAccessToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://github.com/login/oauth/access_token";
@@ -54,6 +55,7 @@ public class GithubAuthServiceImpl implements GithubAuthService {
         return (String) response.getBody().get("access_token");
     }
 
+    @Override
     public Map<String, Object> getUserInfo(String accessToken) {
         String url = "https://api.github.com/user";
 
@@ -67,11 +69,13 @@ public class GithubAuthServiceImpl implements GithubAuthService {
         return response.getBody();
     }
 
+    @Override
     public String getGithubAccessToken(String username) {
         GithubToken token = githubTokenRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("tokenNotFound"));
         return token.getToken();
     }
 
+    @Override
     public void saveGithubToken(String username, String accessToken, String code) {
         Optional<GithubToken> githubToken = githubTokenRepository.findByUsername(username);
         if (githubToken.isPresent()) {

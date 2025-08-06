@@ -20,6 +20,7 @@ public class OpenAiServiceImpl implements AIService {
         this.service = new OpenAiService(openAIConfigurations.getToken(), Duration.ofSeconds(300));
     }
 
+    @Override
     public String send(String llm, String prompt) {
         ChatMessage userMessage = new ChatMessage("user", prompt);
 

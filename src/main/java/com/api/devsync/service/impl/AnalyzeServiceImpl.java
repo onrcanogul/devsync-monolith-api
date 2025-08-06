@@ -34,27 +34,32 @@ public class AnalyzeServiceImpl implements AnalyzeService {
         this.commitAnalyzerService = commitAnalyzerService;
     }
 
+    @Override
     public List<AnalyzeDto> get(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<PullRequestAnalysis> analyzes = repository.findAll(pageable);
         return analyzes.stream().map(analyzeMapper::toDto).toList();
     }
 
+    @Override
     public List<AnalyzeDto> getByRepository(Long repoId) {
         List<PullRequestAnalysis> analyzes = repository.findByPullRequest_Repository_Id(repoId);
         return analyzes.stream().map(analyzeMapper::toDto).toList();
     }
 
+    @Override
     public AnalyzeDto getById(UUID id) {
         Analyze analyze = repository.findById(id).orElseThrow(NullPointerException::new);
         return analyzeMapper.toDto(analyze);
     }
 
+    @Override
     public AnalyzeDto getByPullRequest(Long pullRequestId) {
         Analyze analyze = repository.findByPullRequestId(pullRequestId).orElseThrow(NullPointerException::new);
         return analyzeMapper.toDto(analyze);
     }
 
+    @Override
     public PullRequestAnalysisDto createAnalyze(PrepareAnalyzeDto model) throws JsonProcessingException {
         PullRequestAnalysis analyze = buildBaseAnalysis(model);
         AnalyzeAIDto aiResult = pullRequestAnalyzerServiceImpl.analyze(model);
@@ -79,6 +84,7 @@ public class AnalyzeServiceImpl implements AnalyzeService {
         analyze.setFunctionalComment(prAnalysis.getFunctionalComment());
         analyze.setArchitecturalComment(prAnalysis.getArchitecturalComment());
         analyze.setRiskScore(prAnalysis.getRiskScore());
+        analyze.setRiskReason(prAnalysis.getRiskReason());
     }
 
 
